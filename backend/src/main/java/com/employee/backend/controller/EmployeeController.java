@@ -1,10 +1,12 @@
 package com.employee.backend.controller;
 
 import com.employee.backend.dto.ApiResponse;
+import com.employee.backend.dto.EmployeeSearchRequest;
 import com.employee.backend.entity.Employee;
 import com.employee.backend.exception.EmployeeNotFoundException;
 import com.employee.backend.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +55,17 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<List<Employee>>> findAllEmployee(){
         List<Employee> list=employeeService.findAllEmployee();
         return ResponseEntity.ok(new ApiResponse<>("List of Employees find successfully",list));
+    }
+
+
+    @PostMapping("/search")
+    public ResponseEntity<ApiResponse<Page<Employee>>> searchEmployees(
+            @RequestBody EmployeeSearchRequest request
+    ) {
+        Page<Employee> result = employeeService.searchEmployees(request);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("Employees fetched successfully", result)
+        );
     }
 }
