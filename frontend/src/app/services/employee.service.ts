@@ -33,4 +33,8 @@ export class EmployeeService {
   findAllEmployee(): Observable<any>{
     return this.http.get(`${this.baseUrl}/findAll`);
   }
+
+  searchEmployees(request: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/search`, request);
+}
 }

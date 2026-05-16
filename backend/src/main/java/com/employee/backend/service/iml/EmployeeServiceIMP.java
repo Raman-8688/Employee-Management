@@ -1,5 +1,6 @@
 package com.employee.backend.service.iml;
 
+import com.employee.backend.dto.EmployeeSearchRequest;
 import com.employee.backend.entity.Employee;
 import com.employee.backend.exception.EmployeeNotFoundException;
 import com.employee.backend.reopository.EmployeeRepository;
@@ -8,8 +9,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+
+
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @Slf4j
@@ -70,5 +81,50 @@ public class EmployeeServiceIMP implements EmployeeService {
     @Override
     public List<Employee> findAllEmployee() {
         return employeeRepository.findAll();
+    }
+
+
+
+    @Override
+    public Page<Employee> searchEmployees(EmployeeSearchRequest request) {
+
+        Sort sort = request.getSortDir().equalsIgnoreCase("desc")
+                ? Sort.by(request.getSortBy()).descending()
+                : Sort.by(request.getSortBy()).ascending();
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                sort
+        );
+
+        Specification<Employee> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (request.getName() != null && !request.getName().trim().isEmpty()) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("name")),
+                        "%" + request.getName().toLowerCase() + "%"
+                ));
+            }
+
+            if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("email")),
+                        "%" + request.getEmail().toLowerCase() + "%"
+                ));
+            }
+
+            if (request.getDepartment() != null && !request.getDepartment().trim().isEmpty()) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("department")),
+                        "%" + request.getDepartment().toLowerCase() + "%"
+                ));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return employeeRepository.findAll(spec, pageable);
     }
 }
