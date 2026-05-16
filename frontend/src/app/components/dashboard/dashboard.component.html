@@ -1,0 +1,116 @@
+<!-- <div *ngIf="employeeData">
+
+  <p>ID: {{employeeData.id}}</p>
+  <p>Name: {{employeeData.name}}</p>
+  <p>Email: {{employeeData.email}}</p>
+  <p>Salary: {{employeeData.salary}}</p>
+
+  <button (click)="deleteEmployee(employeeData.id)">
+    Delete
+  </button>
+
+</div> -->
+
+<!-- <h2>Employee Dashboard</h2>
+
+<div *ngFor="let emp of employeeData">
+  <p>ID: {{ emp.id }}</p>
+  <p>Name: {{ emp.name }}</p>
+  <p>Email: {{ emp.email }}</p>
+  <p>Department: {{ emp.department }}</p>
+  <p>Salary: {{ emp.sal }}</p>
+
+  <button (click)="deleteEmployee(emp.id)">Delete</button>
+
+  <button (click)="editEmployee(emp)">Update</button>
+
+  <hr />
+</div>
+
+<h3>Update Employee</h3>
+
+<input [(ngModel)]="selectedEmployee.name" placeholder="Name" />
+<input [(ngModel)]="selectedEmployee.email" placeholder="Email" />
+
+<button (click)="updateEmployee()">Save Changes</button> -->
+
+<!-- <h3>Update Employee</h3>
+
+<input [(ngModel)]="selectedEmployee.name" placeholder="Name" />
+<input [(ngModel)]="selectedEmployee.email" placeholder="Email" />
+<input [(ngModel)]="selectedEmployee.sal" placeholder="Salary" />
+
+<button (click)="updateEmployee()">Save Changes</button>
+
+<h2>Employee Dashboard</h2> -->
+
+<button (click)="openAddPopup()">
+  Add New Employee
+</button>
+
+
+<div *ngIf="showPopup">
+
+  <h3>
+    {{ selectedEmployee.id ? 'Update Employee' : 'Add Employee' }}
+  </h3>
+
+  <input [(ngModel)]="selectedEmployee.name" placeholder="Name">
+
+  <input [(ngModel)]="selectedEmployee.email" placeholder="Email">
+
+  <input [(ngModel)]="selectedEmployee.department" placeholder="Department">
+
+  <input [(ngModel)]="selectedEmployee.sal" placeholder="Salary">
+
+  <br><br>
+
+  <button (click)="saveOrUpdateEmployee()">
+
+    {{ selectedEmployee.id ? 'Update' : 'Save' }}
+
+  </button>
+
+  <button (click)="closePopup()">
+    Cancel
+  </button>
+
+</div>
+<table border="1" cellpadding="10">
+
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Department</th>
+      <th>Salary</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <tr *ngFor="let emp of employeeData">
+
+      <td>{{emp.id}}</td>
+      <td>{{emp.name}}</td>
+      <td>{{emp.email}}</td>
+      <td>{{emp.department}}</td>
+      <td>{{emp.sal}}</td>
+
+      <td>
+        <button (click)="editEmployee(emp)">
+          Update
+        </button>
+
+        <button (click)="deleteEmployee(emp.id)">
+          Delete
+        </button>
+      </td>
+
+    </tr>
+
+  </tbody>
+
+</table>
