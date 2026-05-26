@@ -2,8 +2,6 @@
   <app-sidebar [isCollapsed]="isSidebarCollapsed"></app-sidebar>
   <div class="main-content" [class.expanded]="isSidebarCollapsed">
     <app-navbar (menuToggle)="toggleSidebar()"></app-navbar>
-    <div class="content-area">
-      <router-outlet></router-outlet>
-    </div>
+    <div class="content-area"></div>
   </div>
 </div>
