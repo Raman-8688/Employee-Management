@@ -3,21 +3,38 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { LoginRequest, RegisterRequest, AuthResponse, User } from '../models/user';
+import {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  User,
+} from '../models/user';
+
+// Wrapper response from backend
+interface ApiResponse<T> {
+  message: string;
+  data: T;
+  timeStamp: string;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
-  private tokenKey = 'access_token';
-  private refreshTokenKey = 'refresh_token';
+  private readonly TOKEN_KEY = 'access_token';
+  private readonly USER_KEY = 'user';
 
-  constructor(private http: HttpClient, private router: Router) {
-    this.currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
+    const savedUser = this.getUserFromStorage();
+    this.currentUserSubject = new BehaviorSubject<User | null>(savedUser);
     this.currentUser$ = this.currentUserSubject.asObservable();
+    console.log('AuthService initialized, user:', savedUser);
   }
 
   public get currentUserValue(): User | null {
@@ -25,91 +42,138 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
+    console.log('Attempting login for:', credentials.username);
+    
+    return this.http
+      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/login`, credentials)
       .pipe(
-        tap(response => this.handleAuthResponse(response)),
-        catchError(this.handleError)
+        map(response => {
+          console.log('Raw response:', response);
+          // Extract the nested data
+          return response.data;
+        }),
+        tap((authResponse) => {
+          console.log('Extracted auth response:', authResponse);
+          this.handleAuthResponse(authResponse);
+        }),
+        catchError((error) => {
+          console.error('Login error:', error);
+          return this.handleError(error);
+        })
       );
   }
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData)
+    return this.http
+      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, userData)
       .pipe(
-        tap(response => this.handleAuthResponse(response)),
-        catchError(this.handleError)
-      );
-  }
-
-  refreshToken(): Observable<AuthResponse> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken })
-      .pipe(
-        tap(response => this.handleAuthResponse(response)),
-        catchError(this.handleError)
+        map(response => response.data),
+        tap((response) => this.handleAuthResponse(response)),
+        catchError(this.handleError),
       );
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
-    localStorage.removeItem('user');
+    console.log('Logging out, clearing storage');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.refreshTokenKey);
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    console.log('Getting token:', token ? 'Token exists (length: ' + token.length + ')' : 'No token');
+    return token;
   }
 
   isLoggedIn(): boolean {
     const token = this.getToken();
-    if (!token) return false;
-    return !this.isTokenExpired(token);
+    if (!token) {
+      console.log('isLoggedIn: No token found');
+      return false;
+    }
+    
+    const isValid = !this.isTokenExpired(token);
+    console.log('isLoggedIn:', isValid);
+    return isValid;
   }
 
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp < Date.now() / 1000;
-    } catch {
+      const expired = payload.exp < Date.now() / 1000;
+      if (expired) {
+        console.log('Token expired, logging out');
+        this.logout();
+      }
+      return expired;
+    } catch (error) {
+      console.error('Error checking token expiry:', error);
       return true;
     }
   }
 
   private handleAuthResponse(response: AuthResponse): void {
-    if (response.accessToken) {
-      localStorage.setItem(this.tokenKey, response.accessToken);
-      localStorage.setItem(this.refreshTokenKey, response.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.userInfo));
-      this.currentUserSubject.next(response.userInfo);
+    console.log('handleAuthResponse called with:', response);
+    
+    if (response && response.accessToken) {
+      // Save token
+      localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+      console.log('Token saved to localStorage');
+      
+      // Save user info
+      if (response.userInfo) {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(response.userInfo));
+        console.log('User info saved:', response.userInfo);
+        
+        // Update BehaviorSubject
+        this.currentUserSubject.next(response.userInfo);
+      }
+      
+      // Verify token was saved
+      const savedToken = localStorage.getItem(this.TOKEN_KEY);
+      console.log('Verification - Token saved:', savedToken ? 'Yes' : 'No');
+      console.log('Verification - Token length:', savedToken?.length);
+    } else {
+      console.error('No access token in response:', response);
     }
   }
 
   private getUserFromStorage(): User | null {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem(this.USER_KEY);
     if (userStr) {
-      return JSON.parse(userStr);
+      try {
+        const user = JSON.parse(userStr);
+        console.log('Retrieved user from storage:', user);
+        return user;
+      } catch (error) {
+        console.error('Error parsing user from storage:', error);
+        return null;
+      }
     }
     return null;
   }
 
   private handleError(error: any): Observable<never> {
     let errorMessage = 'An error occurred';
+
+    // Check if error has the wrapped response
     if (error.error?.message) {
       errorMessage = error.error.message;
+    } else if (error.error?.data?.message) {
+      errorMessage = error.error.data.message;
     } else if (error.status === 401) {
-      errorMessage = 'Invalid credentials';
+      errorMessage = 'Invalid username or password';
     } else if (error.status === 403) {
-      errorMessage = 'Access denied';
+      errorMessage = "Access denied. You don't have permission.";
+    } else if (error.status === 0) {
+      errorMessage = 'Cannot connect to server. Please make sure the backend is running on port 8080';
+    } else if (error.status === 500) {
+      errorMessage = 'Server error. Please try again later.';
     }
+
+    console.error('Auth error:', error);
     return throwError(() => new Error(errorMessage));
   }
 

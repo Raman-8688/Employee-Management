@@ -6,92 +6,46 @@ import {
   HttpEvent,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> =
-    new BehaviorSubject<string | null>(null);
-
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    let authReq = req;
-    const token = this.authService.getToken();
-
-    if (token && !this.isAuthEndpoint(req.url)) {
-      authReq = this.addTokenToRequest(req, token);
+    
+    if (req.url.includes('/auth/')) {
+      return next.handle(req);
     }
 
-    return next.handle(authReq).pipe(
-      catchError((error) => {
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401 &&
-          !this.isAuthEndpoint(req.url)
-        ) {
-          return this.handle401Error(authReq, next);
-        }
-        return throwError(() => error);
-      }),
-    );
-  }
+    const token = this.authService.getToken();
 
-  private isAuthEndpoint(url: string): boolean {
-    return (
-      url.includes('/auth/login') ||
-      url.includes('/auth/register') ||
-      url.includes('/auth/refresh')
-    );
-  }
-
-  private addTokenToRequest(
-    request: HttpRequest<any>,
-    token: string,
-  ): HttpRequest<any> {
-    return request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
-  private handle401Error(
-    request: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-      this.refreshTokenSubject.next(null);
-
-      return this.authService.refreshToken().pipe(
-        switchMap((response: any) => {
-          this.isRefreshing = false;
-          this.refreshTokenSubject.next(response.accessToken);
-          return next.handle(
-            this.addTokenToRequest(request, response.accessToken),
-          );
-        }),
-        catchError((error) => {
-          this.isRefreshing = false;
-          this.authService.logout();
+    if (token) {
+      const cloned = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return next.handle(cloned).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
           return throwError(() => error);
         }),
       );
-    } else {
-      return this.refreshTokenSubject.pipe(
-        filter((token) => token !== null),
-        take(1),
-        switchMap((token) =>
-          next.handle(this.addTokenToRequest(request, token!)),
-        ),
-      );
     }
+
+    return next.handle(req);
   }
 }
