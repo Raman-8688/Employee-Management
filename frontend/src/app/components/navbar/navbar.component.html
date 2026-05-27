@@ -1,7 +1,7 @@
 <nav class="navbar">
   <div class="navbar-left">
     <button class="menu-toggle" (click)="toggleMenu()">
-      ☰
+      <mat-icon>menu</mat-icon>
     </button>
     <div class="breadcrumb">
       <span class="breadcrumb-item">Home</span>
@@ -12,18 +12,32 @@
 
   <div class="navbar-right">
     <div class="search-bar">
-      <span class="search-icon">🔍</span>
-      
+      <mat-icon class="search-icon">search</mat-icon>
       <input type="text" placeholder="Search employees, departments..." class="search-input">
     </div>
     
     <div class="notifications">
-      <button class="icon-btn">🔔</button>
+      <button class="icon-btn">
+        <mat-icon>notifications</mat-icon>
+      </button>
       <span class="notification-badge">3</span>
     </div>
     
-    <div class="user-menu">
-      <img src="https://ui-avatars.com/api/?background=667eea&color=fff&name=Shahid+Minh" alt="User" class="user-avatar">
+    <div class="user-menu" (click)="toggleUserMenu()">
+      <div class="user-avatar">
+        {{ getUserName().charAt(0) }}
+      </div>
+      <div class="user-info" *ngIf="showUserMenu">
+        <div class="user-details">
+          <strong>{{ getUserName() }}</strong>
+          <p>{{ getUserRole() }}</p>
+        </div>
+        <div class="menu-divider"></div>
+        <button class="logout-btn" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </div>
     </div>
   </div>
 </nav>
