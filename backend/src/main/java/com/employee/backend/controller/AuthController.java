@@ -1,7 +1,8 @@
 package com.employee.backend.controller;
 
-import com.employee.backend.dto.*;
 
+
+import com.employee.backend.dto.*;
 import com.employee.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +29,21 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>("Login successful", response));
     }
 
+    // Comment out or remove the refresh endpoint
+    /*
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         AuthResponse response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(new ApiResponse<>("Token refreshed successfully", response));
     }
+    */
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        authService.logout(token);
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            authService.logout(token);
+        }
         return ResponseEntity.ok(new ApiResponse<>("Logout successful", null));
     }
 }

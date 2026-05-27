@@ -1,11 +1,11 @@
 package com.employee.backend.service;
 
+
+
 import com.employee.backend.dto.*;
 import com.employee.backend.entity.ERole;
-import com.employee.backend.entity.RefreshToken;
 import com.employee.backend.entity.Role;
 import com.employee.backend.entity.User;
-import com.employee.backend.exception.TokenRefreshException;
 import com.employee.backend.reopository.RoleRepository;
 import com.employee.backend.reopository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,8 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
+    // Remove RefreshTokenService - comment it out
+    // private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -63,11 +64,10 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        // Generate tokens
+        // Generate ONLY access token (no refresh token)
         String accessToken = jwtService.generateToken(savedUser);
-        String refreshToken = refreshTokenService.createRefreshToken(savedUser).getToken();
 
-        return buildAuthResponse(savedUser, accessToken, refreshToken);
+        return buildAuthResponse(savedUser, accessToken);
     }
 
     @Transactional
@@ -83,33 +83,30 @@ public class AuthService {
         // Update last login
         userRepository.updateLastLogin(user.getId(), LocalDateTime.now());
 
+        // Generate ONLY access token (no refresh token)
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
 
-        return buildAuthResponse(user, accessToken, refreshToken);
+        return buildAuthResponse(user, accessToken);
     }
 
+    // Remove or comment out the refreshToken method
+    /*
     @Transactional
     public AuthResponse refreshToken(String refreshTokenStr) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenStr)
-                .orElseThrow(() -> new TokenRefreshException(refreshTokenStr, "Refresh token not found"));
-
-        refreshTokenService.verifyExpiration(refreshToken);
-
-        User user = refreshToken.getUser();
-        String accessToken = jwtService.generateToken(user);
-        String newRefreshToken = refreshTokenService.createRefreshToken(user).getToken();
-
-        return buildAuthResponse(user, accessToken, newRefreshToken);
+        // This method is no longer needed
+        throw new UnsupportedOperationException("Refresh tokens are not supported");
     }
+    */
 
+    // Remove or simplify logout
     @Transactional
     public void logout(String token) {
-        // Invalidate refresh token (implementation depends on your strategy)
-        // For blacklisting, you might want to store invalidated JWT tokens
+        // Just clear any server-side state if needed
+        // For stateless JWT, logout is handled on client side by removing tokens
+        // You can add token to blacklist if needed
     }
 
-    private AuthResponse buildAuthResponse(User user, String accessToken, String refreshToken) {
+    private AuthResponse buildAuthResponse(User user, String accessToken) {
         String role = user.getRoles().stream()
                 .findFirst()
                 .map(r -> r.getName().name())
@@ -117,9 +114,9 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                // No refresh token
                 .tokenType("Bearer")
-                .expiresIn(3600000L) // 1 hour in milliseconds
+                .expiresIn(28800000L) // 8 hours (or whatever you prefer)
                 .userInfo(AuthResponse.UserInfo.builder()
                         .id(user.getId())
                         .username(user.getUsername())
