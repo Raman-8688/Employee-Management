@@ -35,13 +35,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(TokenRefreshException.class)
-    public ResponseEntity<ApiResponse<String>> handleTokenRefresh(TokenRefreshException ex) {
-        return new ResponseEntity<>(
-                new ApiResponse<>(ex.getMessage(), null),
-                HttpStatus.FORBIDDEN
-        );
-    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<String>> handleRuntimeException(RuntimeException ex) {
