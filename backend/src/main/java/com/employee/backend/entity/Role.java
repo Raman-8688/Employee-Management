@@ -22,4 +22,9 @@ public class Role {
     public Role(ERole name) {
         this.name = name;
     }
+
+    // Add this method to return the role name as string
+    public String getRoleName() {
+        return name.name();
+    }
 }

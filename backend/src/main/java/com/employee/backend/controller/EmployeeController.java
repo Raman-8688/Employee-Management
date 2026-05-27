@@ -22,7 +22,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<Employee>> getEmployeeDetails(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeDetail(id)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
@@ -30,44 +30,79 @@ public class EmployeeController {
     }
 
     @PostMapping("/save")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Employee>> saveEmployeeDetails(@RequestBody Employee employee) {
         Employee saved = employeeService.saveEmployeeDetails(employee);
         return ResponseEntity.ok(new ApiResponse<>("Employee saved successfully", saved));
     }
 
     @PatchMapping("/update")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<Employee>> updateEmployeeDetails(@RequestBody Employee employee) {
         Employee updated = employeeService.updateEmployeeDetails(employee);
         return ResponseEntity.ok(new ApiResponse<>("Employee updated successfully", updated));
     }
 
     @PutMapping("/full-update")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Employee>> updateFullEmployeeDetails(@RequestBody Employee employee){
         Employee employee1 = employeeService.updateFullEmployeeDetails(employee);
         return ResponseEntity.ok(new ApiResponse<>("Employee updated successfully", employee1));
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok(new ApiResponse<>("Employee deleted successfully", null));
     }
 
+//    @GetMapping("/findAll")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+//    public ResponseEntity<ApiResponse<List<Employee>>> findAllEmployee(){
+//        List<Employee> list = employeeService.findAllEmployee();
+//        return ResponseEntity.ok(new ApiResponse<>("List of Employees find successfully", list));
+//    }
+
     @GetMapping("/findAll")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+// @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<Employee>>> findAllEmployee(){
         List<Employee> list = employeeService.findAllEmployee();
         return ResponseEntity.ok(new ApiResponse<>("List of Employees find successfully", list));
     }
 
     @PostMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<Page<Employee>>> searchEmployees(@RequestBody EmployeeSearchRequest request) {
         Page<Employee> result = employeeService.searchEmployees(request);
         return ResponseEntity.ok(new ApiResponse<>("Employees fetched successfully", result));
+    }
+
+    @GetMapping("/debug-auth")
+    public ResponseEntity<ApiResponse<String>> debugAuth(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.ok(new ApiResponse<>("No authentication found", null));
+        }
+
+        com.employee.backend.entity.User user = (com.employee.backend.entity.User) authentication.getPrincipal();
+
+        String debugInfo = String.format(
+                "Username: %s\n" +
+                        "Authorities: %s\n" +
+                        "Roles: %s\n" +
+                        "isEnabled: %s\n" +
+                        "isAccountNonExpired: %s\n" +
+                        "isAccountNonLocked: %s\n" +
+                        "isCredentialsNonExpired: %s",
+                user.getUsername(),
+                user.getAuthorities(),
+                user.getRoles(),
+                user.isEnabled(),
+                user.isAccountNonExpired(),
+                user.isAccountNonLocked(),
+                user.isCredentialsNonExpired()
+        );
+
+        return ResponseEntity.ok(new ApiResponse<>(debugInfo, null));
     }
 }
