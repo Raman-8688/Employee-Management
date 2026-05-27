@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit {
     this.returnUrl =
       this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
 
+    // Redirect if already logged in
     if (this.authService.isLoggedIn()) {
       this.router.navigate([this.returnUrl]);
     }
@@ -58,10 +59,12 @@ export class LoginComponent implements OnInit {
     }
 
     this.isLoading = true;
+
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        alert('Login successful! Welcome back!');
-        this.router.navigate([this.returnUrl]);
+        console.log('Login successful, redirecting...');
+        // AuthService handles token storage, just navigate
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         this.errorMessage =
