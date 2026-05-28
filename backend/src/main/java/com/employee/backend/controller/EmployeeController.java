@@ -57,15 +57,8 @@ public class EmployeeController {
         return ResponseEntity.ok(new ApiResponse<>("Employee deleted successfully", null));
     }
 
-//    @GetMapping("/findAll")
-//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
-//    public ResponseEntity<ApiResponse<List<Employee>>> findAllEmployee(){
-//        List<Employee> list = employeeService.findAllEmployee();
-//        return ResponseEntity.ok(new ApiResponse<>("List of Employees find successfully", list));
-//    }
-
     @GetMapping("/findAll")
-// @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ResponseEntity<ApiResponse<List<Employee>>> findAllEmployee(){
         List<Employee> list = employeeService.findAllEmployee();
         return ResponseEntity.ok(new ApiResponse<>("List of Employees find successfully", list));
@@ -90,17 +83,11 @@ public class EmployeeController {
                 "Username: %s\n" +
                         "Authorities: %s\n" +
                         "Roles: %s\n" +
-                        "isEnabled: %s\n" +
-                        "isAccountNonExpired: %s\n" +
-                        "isAccountNonLocked: %s\n" +
-                        "isCredentialsNonExpired: %s",
+                        "isEnabled: %s",
                 user.getUsername(),
                 user.getAuthorities(),
                 user.getRoles(),
-                user.isEnabled(),
-                user.isAccountNonExpired(),
-                user.isAccountNonLocked(),
-                user.isCredentialsNonExpired()
+                user.isEnabled()
         );
 
         return ResponseEntity.ok(new ApiResponse<>(debugInfo, null));
