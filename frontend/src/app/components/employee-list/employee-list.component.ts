@@ -49,7 +49,11 @@ export class EmployeeListComponent implements OnInit {
     this.employeeService.findAllEmployee().subscribe({
       next: (data: Employee[]) => {
         console.log('Employees loaded:', data);
-        this.employees = data;
+        console.log('Is array:', Array.isArray(data));
+        console.log('Length:', data?.length);
+
+        // Ensure data is an array
+        this.employees = Array.isArray(data) ? data : [];
         this.extractDepartments();
         this.applyFiltersAndSort();
         this.isLoading = false;
@@ -57,48 +61,66 @@ export class EmployeeListComponent implements OnInit {
       error: (error) => {
         console.error('Error loading employees:', error);
         this.isLoading = false;
+        this.employees = [];
+        // Show user-friendly message
+        if (error.status === 403) {
+          alert("Access denied. You don't have permission to view employees.");
+        } else {
+          alert('Failed to load employees. Please try again.');
+        }
       },
     });
   }
 
   extractDepartments() {
-    const depts = new Set(this.employees.map((emp) => emp.department));
-    this.departments = Array.from(depts);
+    // Ensure employees is an array before calling map
+    if (Array.isArray(this.employees) && this.employees.length > 0) {
+      const depts = new Set(this.employees.map((emp) => emp.department));
+      this.departments = Array.from(depts);
+    } else {
+      this.departments = [];
+    }
   }
 
   applyFiltersAndSort() {
-    let result = [...this.employees];
+    // Ensure employees is an array
+    let result = Array.isArray(this.employees) ? [...this.employees] : [];
 
     // Apply search query
-    if (this.searchQuery) {
+    if (this.searchQuery && result.length > 0) {
       const query = this.searchQuery.toLowerCase();
       result = result.filter(
         (emp) =>
-          emp.name.toLowerCase().includes(query) ||
-          emp.email.toLowerCase().includes(query) ||
-          emp.department.toLowerCase().includes(query),
+          (emp.name && emp.name.toLowerCase().includes(query)) ||
+          (emp.email && emp.email.toLowerCase().includes(query)) ||
+          (emp.department && emp.department.toLowerCase().includes(query)),
       );
     }
 
     // Apply department filter
-    if (this.filterDepartment) {
+    if (this.filterDepartment && result.length > 0) {
       result = result.filter((emp) => emp.department === this.filterDepartment);
     }
 
     // Apply sorting
-    result.sort((a, b) => {
-      let valueA: any = a[this.sortBy];
-      let valueB: any = b[this.sortBy];
+    if (result.length > 0 && this.sortBy) {
+      result.sort((a, b) => {
+        let valueA: any = a[this.sortBy];
+        let valueB: any = b[this.sortBy];
 
-      if (typeof valueA === 'string') {
-        valueA = valueA.toLowerCase();
-        valueB = valueB.toLowerCase();
-      }
+        if (valueA === undefined) valueA = '';
+        if (valueB === undefined) valueB = '';
 
-      if (valueA < valueB) return this.sortOrder === 'asc' ? -1 : 1;
-      if (valueA > valueB) return this.sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
+        if (typeof valueA === 'string') {
+          valueA = valueA.toLowerCase();
+          valueB = valueB.toLowerCase();
+        }
+
+        if (valueA < valueB) return this.sortOrder === 'asc' ? -1 : 1;
+        if (valueA > valueB) return this.sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
 
     // Update pagination
     this.totalPages = Math.ceil(result.length / this.pageSize);
@@ -110,6 +132,26 @@ export class EmployeeListComponent implements OnInit {
       startIndex,
       startIndex + this.pageSize,
     );
+  }
+
+  getTotalFilteredCount(): number {
+    let result = Array.isArray(this.employees) ? [...this.employees] : [];
+
+    if (this.searchQuery && result.length > 0) {
+      const query = this.searchQuery.toLowerCase();
+      result = result.filter(
+        (emp) =>
+          (emp.name && emp.name.toLowerCase().includes(query)) ||
+          (emp.email && emp.email.toLowerCase().includes(query)) ||
+          (emp.department && emp.department.toLowerCase().includes(query)),
+      );
+    }
+
+    if (this.filterDepartment && result.length > 0) {
+      result = result.filter((emp) => emp.department === this.filterDepartment);
+    }
+
+    return result.length;
   }
 
   onSearchChange() {
@@ -170,26 +212,6 @@ export class EmployeeListComponent implements OnInit {
       this.currentPage++;
       this.applyFiltersAndSort();
     }
-  }
-
-  getTotalFilteredCount(): number {
-    let result = [...this.employees];
-
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      result = result.filter(
-        (emp) =>
-          emp.name.toLowerCase().includes(query) ||
-          emp.email.toLowerCase().includes(query) ||
-          emp.department.toLowerCase().includes(query),
-      );
-    }
-
-    if (this.filterDepartment) {
-      result = result.filter((emp) => emp.department === this.filterDepartment);
-    }
-
-    return result.length;
   }
 
   openAddForm() {

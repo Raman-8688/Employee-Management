@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Employee } from '../models/employee';
 
 @Injectable({
@@ -31,8 +31,23 @@ export class EmployeeService {
     return this.http.delete(`${this.baseUrl}/delete/${id}`);
   }
 
-  findAllEmployee(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/findAll`);
+  findAllEmployee(): Observable<Employee[]> {
+    return this.http.get<any>(`${this.baseUrl}/findAll`).pipe(
+      map((response) => {
+        console.log('Raw response:', response);
+        // Extract the data array from the ApiResponse wrapper
+        if (response && response.data && Array.isArray(response.data)) {
+          return response.data;
+        }
+        // If response is already an array, return it
+        if (Array.isArray(response)) {
+          return response;
+        }
+        // Fallback: return empty array
+        console.error('Unexpected response format:', response);
+        return [];
+      }),
+    );
   }
 
   searchEmployees(request: any): Observable<any> {

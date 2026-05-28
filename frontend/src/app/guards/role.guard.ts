@@ -3,14 +3,18 @@ import { Router, CanActivate, ActivatedRouteSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RoleGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
     const requiredRoles = route.data['roles'] as Array<string>;
-    
+
+    // If no roles required, allow access
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
@@ -20,9 +24,16 @@ export class RoleGuard implements CanActivate {
       return false;
     }
 
-    const hasRole = this.authService.hasAnyRole(requiredRoles);
-    
+    const user = this.authService.currentUserValue;
+    const hasRole = user ? requiredRoles.includes(user.role) : false;
+
     if (!hasRole) {
+      console.log(
+        'Role access denied. User role:',
+        user?.role,
+        'Required roles:',
+        requiredRoles,
+      );
       this.router.navigate(['/unauthorized']);
       return false;
     }
