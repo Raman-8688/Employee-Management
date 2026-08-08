@@ -53,4 +53,10 @@ export class EmployeeService {
   searchEmployees(request: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/search`, request);
   }
+
+  uploadImage(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.baseUrl}/upload-image`, formData);
+  }
 }

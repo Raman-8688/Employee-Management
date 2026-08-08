@@ -134,7 +134,10 @@
         <tr *ngFor="let emp of displayedEmployees">
           <td class="name-cell">
             <div class="employee-info">
-              <div class="employee-avatar">{{ emp.name.charAt(0) }}</div>
+              <div class="employee-avatar">
+                <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" class="avatar-img" />
+                <span *ngIf="!emp.profileImageUrl">{{ emp.name ? emp.name.charAt(0).toUpperCase() : '?' }}</span>
+              </div>
               <div class="employee-name">{{ emp.name }}</div>
             </div>
           </td>

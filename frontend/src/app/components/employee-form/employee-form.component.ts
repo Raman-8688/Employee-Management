@@ -22,8 +22,13 @@ export class EmployeeFormComponent implements OnInit {
     department: '',
     sal: 0,
     employmentType: 'Employment',
-    joinDate: new Date().toISOString().split('T')[0]
+    joinDate: new Date().toISOString().split('T')[0],
+    profileImageUrl: ''
   };
+
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploading = false;
 
   constructor(private employeeService: EmployeeService) {}
 
@@ -35,36 +40,84 @@ export class EmployeeFormComponent implements OnInit {
         department: this.employee.department || '',
         sal: this.employee.sal || 0,
         employmentType: this.employee.employmentType || 'Employment',
-        joinDate: this.employee.joinDate || new Date().toISOString().split('T')[0]
+        joinDate: this.employee.joinDate || new Date().toISOString().split('T')[0],
+        profileImageUrl: this.employee.profileImageUrl || ''
       };
+      if (this.employee.profileImageUrl) {
+        this.imagePreview = this.employee.profileImageUrl;
+      }
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
   save() {
-    const employeeToSave = {
+    this.isUploading = true;
+
+    if (this.selectedFile) {
+      // Upload image first
+      this.employeeService.uploadImage(this.selectedFile).subscribe({
+        next: (res) => {
+          const uploadedUrl = res.data || res;
+          this.formData.profileImageUrl = uploadedUrl;
+          this.submitEmployeeData();
+        },
+        error: (err) => {
+          console.error('Image upload failed:', err);
+          this.isUploading = false;
+          alert('Failed to upload image. Saving employee without new image.');
+          this.submitEmployeeData();
+        }
+      });
+    } else {
+      this.submitEmployeeData();
+    }
+  }
+
+  private submitEmployeeData() {
+    const employeeToSave: Employee = {
       name: this.formData.name,
       email: this.formData.email,
       department: this.formData.department,
       sal: Number(this.formData.sal),
       employmentType: this.formData.employmentType,
-      joinDate: this.formData.joinDate
+      joinDate: this.formData.joinDate,
+      profileImageUrl: this.formData.profileImageUrl
     };
 
     if (this.employee?.id) {
       this.employeeService.updateEmployee({ id: this.employee.id, ...employeeToSave })
         .subscribe({
           next: () => {
+            this.isUploading = false;
             this.close.emit();
           },
-          error: (err) => console.error('Update error:', err)
+          error: (err) => {
+            this.isUploading = false;
+            console.error('Update error:', err);
+          }
         });
     } else {
       this.employeeService.saveEmployee(employeeToSave)
         .subscribe({
           next: () => {
+            this.isUploading = false;
             this.close.emit();
           },
-          error: (err) => console.error('Save error:', err)
+          error: (err) => {
+            this.isUploading = false;
+            console.error('Save error:', err);
+          }
         });
     }
   }

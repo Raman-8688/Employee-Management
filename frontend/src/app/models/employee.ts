@@ -24,4 +24,5 @@ export interface Employee {
   sal: number;
   employmentType?: string;
   joinDate?: string;
+  profileImageUrl?: string;
 }
