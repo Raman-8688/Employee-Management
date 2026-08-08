@@ -16,4 +16,5 @@ public class Employee {
     private String email;
     private String department;
     private Double sal;
+    private String profileImageUrl;
 }

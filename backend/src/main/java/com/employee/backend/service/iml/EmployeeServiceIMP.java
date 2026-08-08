@@ -68,6 +68,9 @@ public class EmployeeServiceIMP implements EmployeeService {
         if(employee.getSal()!=null){
             existing.setSal(employee.getSal());
         }
+        if(employee.getProfileImageUrl()!=null){
+            existing.setProfileImageUrl(employee.getProfileImageUrl());
+        }
 
         return employeeRepository.save(existing);
     }

@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.employee.backend.service.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @RestController
@@ -20,6 +23,14 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final FileStorageService fileStorageService;
+
+    @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
+    public ResponseEntity<ApiResponse<String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+        String imageUrl = fileStorageService.storeFile(file);
+        return ResponseEntity.ok(new ApiResponse<>("Image uploaded successfully", imageUrl));
+    }
 
     @GetMapping("/details/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
