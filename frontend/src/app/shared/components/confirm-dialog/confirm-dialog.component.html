@@ -1,53 +1,54 @@
-<div class="dialog-overlay" *ngIf="currentState" (click)="onCancel()">
-  <div 
-    class="dialog-container" 
-    [class.theme-danger]="currentState.options.type === 'danger'"
-    [class.theme-warning]="currentState.options.type === 'warning'"
-    [class.theme-info]="currentState.options.type === 'info'"
-    (click)="$event.stopPropagation()"
-  >
-    <!-- Modal Icon Header -->
-    <div class="dialog-icon-wrapper">
-      <div class="dialog-icon danger-icon" *ngIf="currentState.options.type === 'danger'">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
+<div 
+  class="modal d-block" 
+  *ngIf="currentState" 
+  tabindex="-1" 
+  style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);" 
+  (click)="onCancel()"
+>
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content border-0 shadow-lg rounded-4 p-4 text-center">
+      <!-- Modal Icon Header -->
+      <div class="d-flex justify-content-center mb-3">
+        <div 
+          class="rounded-circle p-3 d-flex align-items-center justify-content-center"
+          [class.bg-danger-subtle]="currentState.options.type === 'danger'"
+          [class.text-danger]="currentState.options.type === 'danger'"
+          [class.bg-warning-subtle]="currentState.options.type === 'warning'"
+          [class.text-warning]="currentState.options.type === 'warning'"
+          [class.bg-primary-subtle]="currentState.options.type === 'info' || !currentState.options.type"
+          [class.text-primary]="currentState.options.type === 'info' || !currentState.options.type"
+          style="width: 60px; height: 60px;"
+        >
+          <mat-icon class="fs-2">{{ currentState.options.type === 'danger' ? 'delete_forever' : (currentState.options.type === 'warning' ? 'warning' : 'info') }}</mat-icon>
+        </div>
       </div>
 
-      <div class="dialog-icon warning-icon" *ngIf="currentState.options.type === 'warning'">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
+      <!-- Content -->
+      <div class="mb-4">
+        <h4 class="fw-bold text-dark mb-2">{{ currentState.options.title }}</h4>
+        <p class="text-secondary small mb-0">{{ currentState.options.message }}</p>
       </div>
 
-      <div class="dialog-icon info-icon" *ngIf="currentState.options.type === 'info' || !currentState.options.type">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+      <!-- Actions -->
+      <div class="row g-2">
+        <div class="col-6">
+          <button type="button" class="btn btn-light w-100 py-2 fw-medium" (click)="onCancel()">
+            {{ currentState.options.cancelText }}
+          </button>
+        </div>
+        <div class="col-6">
+          <button 
+            type="button" 
+            class="btn w-100 py-2 fw-medium shadow-sm" 
+            [class.btn-danger]="currentState.options.type === 'danger'"
+            [class.btn-warning]="currentState.options.type === 'warning'"
+            [class.btn-primary]="currentState.options.type === 'info' || !currentState.options.type"
+            (click)="onConfirm()"
+          >
+            {{ currentState.options.confirmText }}
+          </button>
+        </div>
       </div>
-    </div>
-
-    <!-- Content -->
-    <div class="dialog-body">
-      <h3 class="dialog-title">{{ currentState.options.title }}</h3>
-      <p class="dialog-message">{{ currentState.options.message }}</p>
-    </div>
-
-    <!-- Actions -->
-    <div class="dialog-actions">
-      <button type="button" class="btn-dialog btn-cancel" (click)="onCancel()">
-        {{ currentState.options.cancelText }}
-      </button>
-      <button 
-        type="button" 
-        class="btn-dialog btn-confirm" 
-        [class.btn-danger]="currentState.options.type === 'danger'"
-        [class.btn-warning]="currentState.options.type === 'warning'"
-        [class.btn-primary]="currentState.options.type === 'info' || !currentState.options.type"
-        (click)="onConfirm()"
-      >
-        {{ currentState.options.confirmText }}
-      </button>
     </div>
   </div>
 </div>

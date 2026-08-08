@@ -5,10 +5,12 @@ import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../models/employee';
 
 
+import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-employee-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './employee-form.component.html',
   styleUrls: ['./employee-form.component.css']
 })

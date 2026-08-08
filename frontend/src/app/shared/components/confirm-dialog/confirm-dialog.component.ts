@@ -4,10 +4,12 @@ import { Subscription } from 'rxjs';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 import { ConfirmState } from '../../models/confirm-dialog.model';
 
+import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.css'],
 })

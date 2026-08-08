@@ -1,196 +1,190 @@
-<div class="people-container">
-  <!-- Header Tabs -->
-  <div class="tabs">
-    <button
-      class="tab"
-      [class.active]="activeTab === 'active'"
-      (click)="activeTab = 'active'"
-    >
-      Active
-      <span class="tab-count">{{ employees.length }}</span>
-    </button>
-    <button
-      class="tab"
-      [class.active]="activeTab === 'onboarding'"
-      (click)="activeTab = 'onboarding'"
-    >
-      Onboarding
-      <span class="tab-count">0</span>
-    </button>
-    <button
-      class="tab"
-      [class.active]="activeTab === 'offboarding'"
-      (click)="activeTab = 'offboarding'"
-    >
-      Offboarding
-      <span class="tab-count">0</span>
-    </button>
-    <button
-      class="tab"
-      [class.active]="activeTab === 'dismissed'"
-      (click)="activeTab = 'dismissed'"
-    >
-      Dismissed
-      <span class="tab-count">0</span>
-    </button>
+<div class="container-fluid p-0">
+  <!-- Navigation Tabs -->
+  <div class="border-bottom mb-4">
+    <ul class="nav nav-tabs border-0">
+      <li class="nav-item">
+        <button
+          class="nav-link fw-semibold px-4"
+          [class.active]="activeTab === 'active'"
+          (click)="activeTab = 'active'"
+        >
+          Active <span class="badge bg-secondary rounded-pill ms-1">{{ employees.length }}</span>
+        </button>
+      </li>
+      <li class="nav-item">
+        <button
+          class="nav-link fw-semibold px-4"
+          [class.active]="activeTab === 'onboarding'"
+          (click)="activeTab = 'onboarding'"
+        >
+          Onboarding <span class="badge bg-light text-dark rounded-pill ms-1">0</span>
+        </button>
+      </li>
+      <li class="nav-item">
+        <button
+          class="nav-link fw-semibold px-4"
+          [class.active]="activeTab === 'offboarding'"
+          (click)="activeTab = 'offboarding'"
+        >
+          Offboarding <span class="badge bg-light text-dark rounded-pill ms-1">0</span>
+        </button>
+      </li>
+    </ul>
   </div>
 
-  <!-- Search & Filters -->
-  <div class="filters-bar">
-    <div class="search-wrapper">
-      <mat-icon class="search-icon">search</mat-icon>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearchChange()"
-        placeholder="Search employees..."
-        class="search-input"
-      />
+  <!-- Search & Action Toolbar -->
+  <div class="row g-3 align-items-center mb-4">
+    <div class="col-md-5 col-lg-4">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0">
+          <mat-icon class="text-muted">search</mat-icon>
+        </span>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Search employees..."
+          class="form-control border-start-0 ps-0"
+        />
+      </div>
     </div>
 
-    <div class="filter-actions">
+    <div class="col-md-4 col-lg-3">
       <select
         [(ngModel)]="filterDepartment"
         (ngModelChange)="onDepartmentFilterChange()"
-        class="filter-select"
+        class="form-select"
       >
         <option value="">All Departments</option>
         <option *ngFor="let dept of departments" [value]="dept">
           {{ dept }}
         </option>
       </select>
+    </div>
 
-      <button class="filter-btn" (click)="clearFilters()">
-        <span>Clear Filters</span>
+    <div class="col-md-3 col-lg-5 d-flex gap-2 justify-content-md-end">
+      <button class="btn btn-outline-secondary d-flex align-items-center gap-1" (click)="clearFilters()">
+        <mat-icon>filter_alt_off</mat-icon> Clear Filters
+      </button>
+
+      <button class="btn btn-primary d-flex align-items-center gap-1 fw-medium shadow-sm" (click)="openAddForm()">
+        <mat-icon>add</mat-icon> Add Employee
       </button>
     </div>
-
-    <button class="add-btn" (click)="openAddForm()">
-      <span>+</span> Add Employee
-    </button>
   </div>
-
-  <!-- Stats Card -->
-  <!-- <div class="stats-card">
-    <h3>Sick Leave Policy</h3>
-    <p>Employees can be enrolled in one sick policy. Make sure that your policy is compliant with your state rules.</p>
-  </div> -->
 
   <!-- Loading State -->
-  <div class="loading-state" *ngIf="isLoading">
-    <div class="spinner"></div>
+  <div class="text-center py-5" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 
-  <!-- Employee Table -->
-  <div class="table-wrapper" *ngIf="!isLoading">
-    <!-- Table Info -->
-    <div class="table-info">
-      <span
-        >Showing {{ displayedEmployees.length }} of
-        {{ getTotalFilteredCount() }} employees</span
-      >
-      <select
-        [(ngModel)]="pageSize"
-        (ngModelChange)="onPageSizeChange()"
-        class="page-size-select"
-      >
-        <option *ngFor="let size of pageSizes" [value]="size">
-          {{ size }} per page
-        </option>
-      </select>
+  <!-- Employee Table Card -->
+  <div class="card border-0 shadow-sm rounded-3 overflow-hidden" *ngIf="!isLoading">
+    <!-- Card Header / Info -->
+    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+      <span class="text-muted small">
+        Showing <strong>{{ displayedEmployees.length }}</strong> of <strong>{{ getTotalFilteredCount() }}</strong> employees
+      </span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">Per page:</span>
+        <select
+          [(ngModel)]="pageSize"
+          (ngModelChange)="onPageSizeChange()"
+          class="form-select form-select-sm w-auto"
+        >
+          <option *ngFor="let size of pageSizes" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
     </div>
 
-    <table class="employee-table">
-      <thead>
-        <tr>
-          <th (click)="sort('name')" class="sortable"  [class.active-sort]="sortBy === 'name'">
-            Name
-            <mat-icon class="sort-icon">
-              {{ getSortIcon("name") }}
-            </mat-icon>
-          </th>
-          <th (click)="sort('email')" class="sortable"  [class.active-sort]="sortBy === 'email'">
-            Email
-            <mat-icon class="sort-icon">
-              {{ getSortIcon("email") }}
-            </mat-icon>
-          </th>
-          <th (click)="sort('department')" class="sortable"  [class.active-sort]="sortBy === 'department'">
-            Department
-            <mat-icon class="sort-icon">
-              {{ getSortIcon("department") }}
-            </mat-icon>
-          </th>
-          <th (click)="sort('sal')" class="sortable"  [class.active-sort]="sortBy === 'sal'">
-            Salary
-            <mat-icon class="sort-icon">
-              {{ getSortIcon("sal") }}
-            </mat-icon>
-          </th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let emp of displayedEmployees">
-          <td class="name-cell">
-            <div class="employee-info">
-              <div class="employee-avatar">
-                <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" class="avatar-img" />
-                <span *ngIf="!emp.profileImageUrl">{{ emp.name ? emp.name.charAt(0).toUpperCase() : '?' }}</span>
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th (click)="sort('name')" class="user-select-none cursor-pointer py-3 px-4" [class.text-primary]="sortBy === 'name'">
+              Name <mat-icon class="align-middle fs-6">{{ getSortIcon("name") }}</mat-icon>
+            </th>
+            <th (click)="sort('email')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'email'">
+              Email <mat-icon class="align-middle fs-6">{{ getSortIcon("email") }}</mat-icon>
+            </th>
+            <th (click)="sort('department')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'department'">
+              Department <mat-icon class="align-middle fs-6">{{ getSortIcon("department") }}</mat-icon>
+            </th>
+            <th (click)="sort('sal')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'sal'">
+              Salary <mat-icon class="align-middle fs-6">{{ getSortIcon("sal") }}</mat-icon>
+            </th>
+            <th class="py-3 text-end px-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of displayedEmployees">
+            <td class="px-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-circle flex-shrink-0">
+                  <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" class="rounded-circle object-fit-cover w-100 h-100" />
+                  <span *ngIf="!emp.profileImageUrl" class="fw-bold">{{ emp.name ? emp.name.charAt(0).toUpperCase() : '?' }}</span>
+                </div>
+                <span class="fw-semibold text-dark">{{ emp.name }}</span>
               </div>
-              <div class="employee-name">{{ emp.name }}</div>
-            </div>
-          </td>
-          <td class="email-cell">{{ emp.email }}</td>
-          <td class="dept-cell">
-            <span class="department-badge">{{ emp.department }}</span>
-          </td>
-          <td class="salary-cell">${{ emp.sal | number }}</td>
-          <td class="actions">
-            <button
-              class="action-edit"
-              (click)="editEmployee(emp)"
-              title="Edit"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              class="action-delete"
-              (click)="deleteEmployee(emp.id!)"
-              title="Delete"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="displayedEmployees.length === 0">
-          <td colspan="5" class="empty-state">
-            <div class="empty-message">
-              <p>No employees found</p>
-              <button class="btn-add-small" (click)="clearFilters()">
+            </td>
+            <td class="text-secondary">{{ emp.email }}</td>
+            <td>
+              <span class="badge badge-soft-primary">{{ emp.department }}</span>
+            </td>
+            <td class="fw-semibold text-success">${{ emp.sal | number }}</td>
+            <td class="text-end px-4">
+              <button
+                class="btn btn-sm btn-light text-primary me-2 rounded-circle p-2"
+                (click)="editEmployee(emp)"
+                title="Edit"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                class="btn btn-sm btn-light text-danger rounded-circle p-2"
+                (click)="deleteEmployee(emp.id!)"
+                title="Delete"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Empty State -->
+          <tr *ngIf="displayedEmployees.length === 0">
+            <td colspan="5" class="text-center py-5 text-muted">
+              <mat-icon class="fs-1 text-secondary mb-2">sentiment_dissatisfied</mat-icon>
+              <p class="mb-2">No employees found matching criteria</p>
+              <button class="btn btn-sm btn-outline-primary" (click)="clearFilters()">
                 Clear Filters
               </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <!-- Pagination -->
-    <div class="pagination" *ngIf="totalPages > 1">
+    <!-- Pagination Footer -->
+    <div class="card-footer bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center" *ngIf="totalPages > 1">
       <button
-        class="page-btn"
+        class="btn btn-sm btn-outline-secondary"
         (click)="previousPage()"
         [disabled]="currentPage === 1"
       >
         ← Previous
       </button>
 
-      <div class="page-numbers">
+      <div class="d-flex gap-1">
         <button
           *ngFor="let page of [].constructor(totalPages); let i = index"
-          class="page-number"
-          [class.active]="i + 1 === currentPage"
+          class="btn btn-sm"
+          [class.btn-primary]="i + 1 === currentPage"
+          [class.btn-light]="i + 1 !== currentPage"
           (click)="goToPage(i + 1)"
         >
           {{ i + 1 }}
@@ -198,7 +192,7 @@
       </div>
 
       <button
-        class="page-btn"
+        class="btn btn-sm btn-outline-secondary"
         (click)="nextPage()"
         [disabled]="currentPage === totalPages"
       >
