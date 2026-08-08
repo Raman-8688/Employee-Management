@@ -5,6 +5,7 @@ import { EmployeeService } from '../../services/employee.service';
 import { EmployeeFormComponent } from '../employee-form/employee-form.component';
 import { Employee } from '../../models/employee';
 import { MatIconModule } from '@angular/material/icon';
+import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-employee-list',
@@ -38,7 +39,10 @@ export class EmployeeListComponent implements OnInit {
   totalPages = 0;
   pageSizes = [5, 10, 20, 50];
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(
+    private employeeService: EmployeeService,
+    private confirmDialogService: ConfirmDialogService
+  ) {}
 
   ngOnInit() {
     this.loadEmployees();
@@ -224,8 +228,19 @@ export class EmployeeListComponent implements OnInit {
     this.showForm = true;
   }
 
-  deleteEmployee(id: number) {
-    if (confirm('Are you sure you want to delete this employee?')) {
+  async deleteEmployee(id: number) {
+    const employeeToDelete = this.employees.find((e) => e.id === id);
+    const employeeName = employeeToDelete ? employeeToDelete.name : 'this employee';
+
+    const confirmed = await this.confirmDialogService.confirm({
+      title: 'Delete Employee',
+      message: `Are you sure you want to delete ${employeeName}? This action cannot be undone.`,
+      confirmText: 'Delete Employee',
+      cancelText: 'Cancel',
+      type: 'danger'
+    });
+
+    if (confirmed) {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
           this.loadEmployees();

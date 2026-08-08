@@ -1,0 +1,53 @@
+<div class="dialog-overlay" *ngIf="currentState" (click)="onCancel()">
+  <div 
+    class="dialog-container" 
+    [class.theme-danger]="currentState.options.type === 'danger'"
+    [class.theme-warning]="currentState.options.type === 'warning'"
+    [class.theme-info]="currentState.options.type === 'info'"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Modal Icon Header -->
+    <div class="dialog-icon-wrapper">
+      <div class="dialog-icon danger-icon" *ngIf="currentState.options.type === 'danger'">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+
+      <div class="dialog-icon warning-icon" *ngIf="currentState.options.type === 'warning'">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+
+      <div class="dialog-icon info-icon" *ngIf="currentState.options.type === 'info' || !currentState.options.type">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="dialog-body">
+      <h3 class="dialog-title">{{ currentState.options.title }}</h3>
+      <p class="dialog-message">{{ currentState.options.message }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="dialog-actions">
+      <button type="button" class="btn-dialog btn-cancel" (click)="onCancel()">
+        {{ currentState.options.cancelText }}
+      </button>
+      <button 
+        type="button" 
+        class="btn-dialog btn-confirm" 
+        [class.btn-danger]="currentState.options.type === 'danger'"
+        [class.btn-warning]="currentState.options.type === 'warning'"
+        [class.btn-primary]="currentState.options.type === 'info' || !currentState.options.type"
+        (click)="onConfirm()"
+      >
+        {{ currentState.options.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>
