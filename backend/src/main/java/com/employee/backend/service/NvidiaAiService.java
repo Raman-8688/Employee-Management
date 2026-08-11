@@ -49,10 +49,15 @@ public class NvidiaAiService {
         // Fallback models if primary model fails or is rate-limited
         List<String> candidateModels = new ArrayList<>();
         candidateModels.add(primaryModel);
+        if (!primaryModel.equals("meta/llama-3.1-8b-instruct")) {
+            candidateModels.add("meta/llama-3.1-8b-instruct");
+        }
         if (!primaryModel.equals("meta/llama-3.1-70b-instruct")) {
             candidateModels.add("meta/llama-3.1-70b-instruct");
         }
-        candidateModels.add("mistralai/mixtral-8x22b-instruct-v0.1");
+        if (!primaryModel.equals("meta/llama3-8b-instruct")) {
+            candidateModels.add("meta/llama3-8b-instruct");
+        }
 
         String systemInstruction = request.getSystemPrompt() != null 
                 ? request.getSystemPrompt()

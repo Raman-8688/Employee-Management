@@ -49,9 +49,11 @@ public class AiCopilotController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<List<String>>> getAvailableModels() {
         List<String> models = Arrays.asList(
+                "meta/llama-3.1-8b-instruct",
                 "meta/llama-3.1-70b-instruct",
-                "meta/llama-3.1-405b-instruct",
-                "mistralai/mixtral-8x22b-instruct-v0.1"
+                "meta/llama3-8b-instruct",
+                "mistralai/mistral-7b-instruct-v0.2",
+                "google/gemma-2-27b-it"
         );
         return ResponseEntity.ok(new ApiResponse<>("Available Nvidia AI models fetched", models));
     }
