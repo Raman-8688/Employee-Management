@@ -288,4 +288,51 @@ export class EmployeeListComponent implements OnInit {
     this.showForm = false;
     this.loadEmployees();
   }
+
+  // WhatsApp Style Photo Modal Properties & Methods
+  photoPreviewEmployee: Employee | null = null;
+  showPhotoModal = false;
+  isUploadingPhoto = false;
+
+  openPhotoPreview(emp: Employee, event: MouseEvent) {
+    event.stopPropagation();
+    this.photoPreviewEmployee = emp;
+    this.showPhotoModal = true;
+  }
+
+  closePhotoPreview() {
+    this.showPhotoModal = false;
+    this.photoPreviewEmployee = null;
+  }
+
+  onPhotoSelectedInModal(event: any) {
+    const file = event.target.files[0];
+    if (file && this.photoPreviewEmployee) {
+      this.isUploadingPhoto = true;
+      this.employeeService.uploadImage(file).subscribe({
+        next: (response: any) => {
+          const imageUrl = response.imageUrl;
+          if (this.photoPreviewEmployee) {
+            this.photoPreviewEmployee.profileImageUrl = imageUrl;
+            // Persist update in DB
+            this.employeeService.updateEmployee(this.photoPreviewEmployee).subscribe({
+              next: () => {
+                this.isUploadingPhoto = false;
+                this.loadEmployees();
+              },
+              error: (err) => {
+                console.error('Error saving updated employee photo:', err);
+                this.isUploadingPhoto = false;
+              }
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error uploading photo:', err);
+          this.isUploadingPhoto = false;
+          alert('Failed to upload image. Please try again.');
+        }
+      });
+    }
+  }
 }

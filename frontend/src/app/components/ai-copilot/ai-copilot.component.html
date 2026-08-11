@@ -1,6 +1,6 @@
-<!-- Persistent Floating Trigger Button (Bottom-Right) -->
+<!-- Persistent Floating Trigger Button (Hidden on full page route) -->
 <button 
-  *ngIf="!isFullPage"
+  *ngIf="!isFullPage && !isOpen"
   class="btn btn-primary rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center copilot-trigger-btn"
   (click)="toggleDrawer()"
   title="Open Nvidia AI HR Copilot"
@@ -43,19 +43,6 @@
       </button>
       <button *ngIf="!isFullPage" type="button" class="btn-close btn-close-white" (click)="isOpen = false"></button>
     </div>
-  </div>
-
-  <!-- Model Selector Toolbar -->
-  <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2">
-      <mat-icon class="text-secondary fs-5">tune</mat-icon>
-      <span class="text-secondary fw-semibold small">Active Nvidia Model:</span>
-    </div>
-    <select [(ngModel)]="selectedModel" class="form-select form-select-sm w-auto border-0 bg-white shadow-sm fw-medium px-3 py-2">
-      <option *ngFor="let m of availableModels" [value]="m">
-        {{ m }}
-      </option>
-    </select>
   </div>
 
   <!-- Quick Action Chips -->
@@ -148,57 +135,76 @@
     <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 text-xs" (click)="toggleMicrophone()">Stop</button>
   </div>
 
-  <!-- Input Footer Toolbar -->
+  <!-- Sleek ChatGPT/Claude-Style Input Toolbar -->
   <div class="p-3 border-top bg-white">
-    <form (ngSubmit)="sendMessage()" class="d-flex align-items-center gap-2">
-      <!-- File Attachment Button -->
-      <input 
-        type="file" 
-        #fileInput 
-        (change)="onFileSelected($event)" 
-        accept=".txt,.csv,.json,.doc,.pdf" 
-        class="d-none" />
-
-      <button 
-        type="button" 
-        class="btn btn-light btn-md rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary border"
-        (click)="fileInput.click()"
-        title="Attach HR Document for AI Analysis"
-      >
-        <mat-icon>attach_file</mat-icon>
-      </button>
-
-      <!-- Microphone Voice Recording Button -->
-      <button 
-        type="button" 
-        class="btn btn-md rounded-circle p-2 d-flex align-items-center justify-content-center border"
-        [class.btn-danger]="isListening"
-        [class.btn-light]="!isListening"
-        [class.text-secondary]="!isListening"
-        (click)="toggleMicrophone()"
-        [title]="isListening ? 'Stop Recording' : 'Record Voice Input (Microphone)'"
-      >
-        <mat-icon [class.pulse-icon]="isListening">{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
-      </button>
-
+    <form (ngSubmit)="sendMessage()" class="chat-input-card p-2 border rounded-4 shadow-sm bg-light">
       <!-- Text Input Box -->
-      <input 
-        type="text" 
+      <textarea 
         [(ngModel)]="userMessage" 
         name="userMessage"
         placeholder="Ask AI Copilot or speak using microphone..." 
-        class="form-control form-control-md rounded-pill px-4"
-        [disabled]="isLoading" />
+        class="form-control border-0 bg-transparent shadow-none px-3 py-2 text-area-input"
+        rows="2"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        [disabled]="isLoading"
+      ></textarea>
 
-      <!-- Send Button -->
-      <button 
-        type="submit" 
-        class="btn btn-primary btn-md rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm"
-        [disabled]="(!userMessage.trim() && !selectedFile) || isLoading"
-        title="Send Prompt"
-      >
-        <mat-icon>send</mat-icon>
-      </button>
+      <!-- Bottom Action Row inside Input Box -->
+      <div class="d-flex align-items-center justify-content-between pt-2 px-2 border-top border-light-subtle">
+        <!-- Model Selector Dropdown & File & Mic Controls -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- Model Selector Dropdown -->
+          <div class="d-flex align-items-center bg-white border rounded-pill px-2 py-1 shadow-2xs">
+            <mat-icon class="text-secondary fs-6 me-1">tune</mat-icon>
+            <select [(ngModel)]="selectedModel" name="selectedModel" class="form-select form-select-sm border-0 bg-transparent py-0 pe-4 shadow-none fw-medium text-secondary" style="font-size: 12px; width: auto;">
+              <option *ngFor="let m of availableModels" [value]="m">
+                {{ m }}
+              </option>
+            </select>
+          </div>
+
+          <!-- File Attachment Button -->
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelected($event)" 
+            accept=".txt,.csv,.json,.doc,.pdf" 
+            class="d-none" />
+
+          <button 
+            type="button" 
+            class="btn btn-light btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary border bg-white"
+            (click)="fileInput.click()"
+            title="Attach HR Document"
+          >
+            <mat-icon class="fs-6">attach_file</mat-icon>
+          </button>
+
+          <!-- Microphone Voice Recording Button -->
+          <button 
+            type="button" 
+            class="btn btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center border"
+            [class.btn-danger]="isListening"
+            [class.btn-light]="!isListening"
+            [class.bg-white]="!isListening"
+            [class.text-secondary]="!isListening"
+            (click)="toggleMicrophone()"
+            [title]="isListening ? 'Stop Recording' : 'Record Voice Input'"
+          >
+            <mat-icon class="fs-6" [class.pulse-icon]="isListening">{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
+          </button>
+        </div>
+
+        <!-- Send Button -->
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-md rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm"
+          [disabled]="(!userMessage.trim() && !selectedFile) || isLoading"
+          title="Send Prompt"
+        >
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
     </form>
   </div>
 </div>

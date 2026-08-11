@@ -93,6 +93,26 @@
   margin: 0 !important;
 }
 
+.chat-input-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-input-card:focus-within {
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+}
+
+.text-area-input {
+  resize: none;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+.text-area-input:focus {
+  outline: none;
+}
+
 @media (max-width: 768px) {
   .copilot-drawer {
     width: 100vw;

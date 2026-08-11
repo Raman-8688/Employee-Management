@@ -125,8 +125,8 @@
           <tr *ngFor="let emp of displayedEmployees">
             <td class="px-4">
               <div class="d-flex align-items-center gap-3">
-                <div class="avatar-circle flex-shrink-0">
-                  <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" class="rounded-circle object-fit-cover w-100 h-100" />
+                <div class="avatar-circle flex-shrink-0 cursor-pointer" (click)="openPhotoPreview(emp, $event)" title="Click to view profile picture">
+                  <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" />
                   <span *ngIf="!emp.profileImageUrl" class="fw-bold">{{ emp.name ? emp.name.charAt(0).toUpperCase() : '?' }}</span>
                 </div>
                 <span class="fw-semibold text-dark">{{ emp.name }}</span>
@@ -215,4 +215,54 @@
     (close)="onFormClose()"
   >
   </app-employee-form>
+
+  <!-- WhatsApp Style Profile Photo Lightbox Modal -->
+  <div *ngIf="showPhotoModal && photoPreviewEmployee" class="photo-modal-overlay d-flex align-items-center justify-content-center p-3" (click)="closePhotoPreview()">
+    <div class="photo-modal-card bg-dark text-white rounded-4 shadow-lg overflow-hidden position-relative" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="p-3 d-flex align-items-center justify-content-between border-bottom border-secondary">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-primary">account_circle</mat-icon>
+          <div>
+            <h6 class="mb-0 fw-bold text-white">{{ photoPreviewEmployee.name }}</h6>
+            <small class="text-secondary" style="font-size: 12px;">{{ photoPreviewEmployee.department }} • {{ photoPreviewEmployee.email }}</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closePhotoPreview()"></button>
+      </div>
+
+      <!-- Photo Display Area -->
+      <div class="photo-display-container p-4 bg-black d-flex align-items-center justify-content-center position-relative" style="min-height: 320px; max-height: 500px;">
+        <img 
+          *ngIf="photoPreviewEmployee.profileImageUrl" 
+          [src]="photoPreviewEmployee.profileImageUrl" 
+          [alt]="photoPreviewEmployee.name"
+          class="img-fluid rounded-3 shadow"
+          style="max-height: 420px; object-fit: contain; image-rendering: -webkit-optimize-contrast;" 
+        />
+
+        <div *ngIf="!photoPreviewEmployee.profileImageUrl" class="text-center py-5 text-secondary">
+          <mat-icon class="display-1 mb-2">person</mat-icon>
+          <p class="mb-0">No profile photo uploaded</p>
+        </div>
+
+        <div *ngIf="isUploadingPhoto" class="position-absolute top-0 start-0 w-100 h-100 bg-black bg-opacity-75 d-flex flex-column align-items-center justify-content-center text-primary">
+          <div class="spinner-border mb-2" role="status"></div>
+          <small class="fw-semibold">Updating Profile Photo...</small>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="p-3 bg-dark border-top border-secondary d-flex align-items-center justify-content-between">
+        <input type="file" #modalFileInput (change)="onPhotoSelectedInModal($event)" accept="image/*" class="d-none" />
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 d-flex align-items-center gap-2" (click)="modalFileInput.click()" [disabled]="isUploadingPhoto">
+          <mat-icon class="fs-6">photo_camera</mat-icon>
+          <span>Change Photo</span>
+        </button>
+        <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-4" (click)="closePhotoPreview()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
