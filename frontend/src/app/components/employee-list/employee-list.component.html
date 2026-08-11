@@ -140,6 +140,13 @@
             <td class="text-end px-4">
               <button
                 class="btn btn-sm btn-light text-primary me-2 rounded-circle p-2"
+                (click)="generateAiReview(emp)"
+                title="AI Performance Review"
+              >
+                <mat-icon>auto_awesome</mat-icon>
+              </button>
+              <button
+                class="btn btn-sm btn-light text-primary me-2 rounded-circle p-2"
                 (click)="editEmployee(emp)"
                 title="Edit"
               >

@@ -1,0 +1,53 @@
+/* Floating Copilot Button */
+.copilot-trigger-btn {
+  width: 56px;
+  height: 56px;
+  z-index: 9999;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: none;
+  transition: transform 0.22s ease-in-out;
+}
+
+.copilot-trigger-btn:hover {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+}
+
+/* Side Drawer Panel */
+.copilot-drawer {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  z-index: 10000;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+}
+
+.copilot-drawer.open {
+  right: 0;
+}
+
+.max-w-85 {
+  max-width: 85%;
+}
+
+.text-xs {
+  font-size: 11px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 576px) {
+  .copilot-drawer {
+    width: 100vw;
+    right: -100vw;
+  }
+}

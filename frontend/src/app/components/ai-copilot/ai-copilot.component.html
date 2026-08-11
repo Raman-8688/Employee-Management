@@ -1,0 +1,152 @@
+<!-- Floating Trigger Button -->
+<button 
+  class="btn btn-primary rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center copilot-trigger-btn"
+  (click)="toggleDrawer()"
+  title="Nvidia AI HR Copilot"
+>
+  <mat-icon class="fs-3">smart_toy</mat-icon>
+  <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
+    <span class="visually-hidden">Active</span>
+  </span>
+</button>
+
+<!-- Slide-Out Copilot Drawer -->
+<div 
+  class="copilot-drawer shadow-lg border-start bg-white d-flex flex-column"
+  [class.open]="isOpen"
+>
+  <!-- Drawer Header -->
+  <div class="p-3 bg-dark text-white d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <mat-icon class="text-info">smart_toy</mat-icon>
+      <div>
+        <h6 class="mb-0 fw-bold">Nvidia AI HR Copilot</h6>
+        <small class="text-white-50" style="font-size: 11px;">Powered by Nvidia LLMs</small>
+      </div>
+    </div>
+    <button type="button" class="btn-close btn-close-white" (click)="toggleDrawer()"></button>
+  </div>
+
+  <!-- Model Selector Bar -->
+  <div class="p-2 bg-light border-bottom d-flex align-items-center justify-content-between px-3">
+    <small class="text-secondary fw-semibold">Model:</small>
+    <select [(ngModel)]="selectedModel" class="form-select form-select-sm w-auto border-0 bg-white shadow-sm fw-medium">
+      <option *ngFor="let m of availableModels" [value]="m">
+        {{ m.split('/')[1] || m }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Quick Action Chips -->
+  <div class="p-2 border-bottom bg-white d-flex gap-1 overflow-x-auto text-nowrap px-3 scrollbar-hidden">
+    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('Suggest key goals for IT department employees')">
+      🎯 IT Department Goals
+    </button>
+    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('Draft a formal promotion recommendation letter template')">
+      📝 Promotion Template
+    </button>
+    <button class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('What are standard sick leave & compliance policies?')">
+      📜 HR Policies
+    </button>
+  </div>
+
+  <!-- Chat Messages Body -->
+  <div class="flex-grow-1 p-3 overflow-y-auto d-flex flex-column gap-3 chat-messages-container">
+    <div 
+      *ngFor="let msg of messages" 
+      class="d-flex flex-column"
+      [class.align-items-end]="msg.sender === 'user'"
+      [class.align-items-start]="msg.sender === 'ai'"
+    >
+      <div 
+        class="p-3 rounded-4 shadow-sm max-w-85"
+        [class.bg-primary]="msg.sender === 'user'"
+        [class.text-white]="msg.sender === 'user'"
+        [class.bg-light]="msg.sender === 'ai'"
+        [class.text-dark]="msg.sender === 'ai'"
+        [class.border]="msg.sender === 'ai'"
+      >
+        <div class="d-flex align-items-center justify-content-between mb-1 gap-2">
+          <small class="fw-bold" [class.text-white-50]="msg.sender === 'user'" [class.text-secondary]="msg.sender === 'ai'">
+            {{ msg.sender === 'user' ? 'You' : 'Nvidia AI' }}
+          </small>
+          <span *ngIf="msg.modelUsed" class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 10px;">
+            {{ msg.modelUsed.split('/')[1] || msg.modelUsed }}
+          </span>
+        </div>
+
+        <div class="message-text" style="white-space: pre-wrap; font-size: 13.5px; line-height: 1.5;">
+          {{ msg.text }}
+        </div>
+
+        <!-- Voice Reader Speaker Button for AI Messages -->
+        <div *ngIf="msg.sender === 'ai'" class="mt-2 pt-2 border-top d-flex justify-content-end">
+          <button 
+            type="button" 
+            class="btn btn-sm btn-link text-decoration-none text-primary p-0 d-flex align-items-center gap-1"
+            (click)="speakMessage(msg.text)"
+            title="Read Response Aloud"
+          >
+            <mat-icon class="fs-6">volume_up</mat-icon>
+            <span style="font-size: 11px;">Listen</span>
+          </button>
+        </div>
+      </div>
+      <small class="text-muted mt-1 px-1" style="font-size: 10px;">
+        {{ msg.timestamp | date:'shortTime' }}
+      </small>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="d-flex align-items-center gap-2 text-primary p-2">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <small class="fw-medium">Nvidia AI is thinking...</small>
+    </div>
+  </div>
+
+  <!-- Document Attachment Bar -->
+  <div *ngIf="selectedFile" class="px-3 py-2 bg-light border-top d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2 text-truncate">
+      <mat-icon class="text-primary">description</mat-icon>
+      <small class="fw-semibold text-truncate">{{ selectedFile.name }}</small>
+    </div>
+    <button type="button" class="btn-close btn-close-sm" (click)="removeSelectedFile()"></button>
+  </div>
+
+  <!-- Chat Input Footer -->
+  <div class="p-3 border-top bg-white">
+    <form (ngSubmit)="sendMessage()" class="d-flex align-items-center gap-2">
+      <input 
+        type="file" 
+        #fileInput 
+        (change)="onFileSelected($event)" 
+        accept=".txt,.csv,.json,.doc,.pdf" 
+        class="d-none" />
+
+      <button 
+        type="button" 
+        class="btn btn-outline-secondary btn-sm p-2 rounded-circle d-flex align-items-center justify-content-center"
+        (click)="fileInput.click()"
+        title="Attach HR Document for AI Analysis"
+      >
+        <mat-icon>attach_file</mat-icon>
+      </button>
+
+      <input 
+        type="text" 
+        [(ngModel)]="userMessage" 
+        name="userMessage"
+        placeholder="Ask AI Copilot or type query..." 
+        class="form-control form-control-sm rounded-pill px-3"
+        [disabled]="isLoading" />
+
+      <button 
+        type="submit" 
+        class="btn btn-primary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center"
+        [disabled]="(!userMessage.trim() && !selectedFile) || isLoading"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </div>
+</div>

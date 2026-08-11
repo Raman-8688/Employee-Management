@@ -6,6 +6,7 @@ import { EmployeeFormComponent } from '../employee-form/employee-form.component'
 import { Employee } from '../../models/employee';
 import { MatIconModule } from '@angular/material/icon';
 import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
+import { AiService } from '../../services/ai.service';
 
 @Component({
   selector: 'app-employee-list',
@@ -41,7 +42,8 @@ export class EmployeeListComponent implements OnInit {
 
   constructor(
     private employeeService: EmployeeService,
-    private confirmDialogService: ConfirmDialogService
+    private confirmDialogService: ConfirmDialogService,
+    private aiService: AiService
   ) {}
 
   ngOnInit() {
@@ -251,6 +253,35 @@ export class EmployeeListComponent implements OnInit {
         },
       });
     }
+  }
+
+  generateAiReview(emp: Employee) {
+    if (!emp.id) return;
+    this.confirmDialogService.confirm({
+      title: `✨ AI Appraisal: ${emp.name}`,
+      message: `Generate an automated Nvidia AI performance evaluation report for ${emp.name} (${emp.department})?`,
+      confirmText: 'Generate Review',
+      cancelText: 'Cancel',
+      type: 'info'
+    }).then((confirmed) => {
+      if (confirmed) {
+        this.aiService.generatePerformanceReview(emp.id!).subscribe({
+          next: (res) => {
+            this.confirmDialogService.confirm({
+              title: `✨ AI Performance Report (${emp.name})`,
+              message: res.data.reply,
+              confirmText: 'Done',
+              cancelText: 'Close',
+              type: 'info'
+            });
+          },
+          error: (err) => {
+            console.error('AI Review Error:', err);
+            alert('Failed to generate AI performance review.');
+          }
+        });
+      }
+    });
   }
 
   onFormClose() {
