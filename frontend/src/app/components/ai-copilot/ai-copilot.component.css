@@ -71,6 +71,28 @@
   }
 }
 
+/* Quick Action Chips Styling */
+.chip-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 50px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.chip-btn .mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  margin: 0 !important;
+}
+
 @media (max-width: 768px) {
   .copilot-drawer {
     width: 100vw;

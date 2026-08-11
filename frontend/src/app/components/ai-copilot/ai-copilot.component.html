@@ -59,15 +59,15 @@
   </div>
 
   <!-- Quick Action Chips -->
-  <div class="p-2 border-bottom bg-white d-flex gap-2 overflow-x-auto text-nowrap px-3 scrollbar-hidden">
-    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('Suggest key goals and career milestones for IT department employees')">
-      <mat-icon class="fs-6">flag</mat-icon> IT Department Goals
+  <div class="p-3 border-bottom bg-white d-flex gap-2 overflow-x-auto text-nowrap px-3 scrollbar-hidden">
+    <button type="button" class="btn btn-outline-primary chip-btn" (click)="sendQuickChip('Suggest key goals and career milestones for IT department employees')">
+      <mat-icon>flag</mat-icon> IT Department Goals
     </button>
-    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('Draft a formal promotion recommendation letter template for an employee')">
-      <mat-icon class="fs-6">description</mat-icon> Promotion Template
+    <button type="button" class="btn btn-outline-secondary chip-btn" (click)="sendQuickChip('Draft a formal promotion recommendation letter template for an employee')">
+      <mat-icon>description</mat-icon> Promotion Template
     </button>
-    <button class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('What are standard sick leave, remote work, and compliance policies?')">
-      <mat-icon class="fs-6">policy</mat-icon> HR Policies
+    <button type="button" class="btn btn-outline-info chip-btn" (click)="sendQuickChip('What are standard sick leave, remote work, and compliance policies?')">
+      <mat-icon>policy</mat-icon> HR Policies
     </button>
   </div>
 
