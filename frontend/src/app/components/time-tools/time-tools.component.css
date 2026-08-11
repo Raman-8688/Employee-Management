@@ -1,0 +1,67 @@
+.time-tools-container {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 70px);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+.bg-purple {
+  background-color: #7c3aed !important;
+}
+
+.text-purple {
+  color: #7c3aed !important;
+}
+
+.style-13 {
+  font-size: 13px;
+}
+
+/* Nav Tabs Styling */
+.nav-tabs .nav-link {
+  color: #64748b;
+  border-bottom: 2px solid transparent !important;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-tabs .nav-link.active {
+  color: #4f46e5 !important;
+  border-bottom: 2px solid #4f46e5 !important;
+}
+
+/* Admin Override Modal Overlay */
+.override-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 10050;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.override-modal-card {
+  width: 500px;
+  max-width: 92vw;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: scaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

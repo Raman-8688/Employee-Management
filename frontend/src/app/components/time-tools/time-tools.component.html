@@ -1,0 +1,375 @@
+<div class="container-fluid p-4 time-tools-container">
+  <!-- Top Header Bar with Live Clock Punch Widget -->
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+    <div>
+      <h3 class="fw-bold mb-1 text-dark">Time Tools & Attendance</h3>
+      <p class="text-secondary mb-0 small">Real-time attendance tracking, monthly logs, overtime metrics, and audit history.</p>
+    </div>
+
+    <!-- Live Punch Clock Widget -->
+    <div class="d-flex align-items-center gap-3 bg-white p-2 px-3 rounded-pill border shadow-sm">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge rounded-circle p-2" [class.bg-success]="isClockedIn" [class.bg-secondary]="!isClockedIn"></span>
+        <div>
+          <small class="text-secondary d-block" style="font-size: 10px; line-height: 1;">Status</small>
+          <span class="fw-bold text-dark" style="font-size: 13px;">{{ isClockedIn ? 'Clocked In' : 'Clocked Out' }}</span>
+        </div>
+      </div>
+      <div class="vr my-1"></div>
+      <button 
+        class="btn btn-sm rounded-pill px-4 fw-semibold d-flex align-items-center gap-1 shadow-xs"
+        [class.btn-success]="!isClockedIn"
+        [class.btn-danger]="isClockedIn"
+        (click)="toggleClockIn()"
+      >
+        <mat-icon class="fs-6">{{ isClockedIn ? 'logout' : 'login' }}</mat-icon>
+        <span>{{ isClockedIn ? 'Clock Out' : 'Clock In' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 1. EXECUTIVE SUMMARY CARDS GRID -->
+  <div class="row g-3 mb-4">
+    <!-- Card 1: Working Days -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-secondary fw-semibold small">Working Days</span>
+          <div class="p-2 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center">
+            <mat-icon>calendar_month</mat-icon>
+          </div>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">{{ summary.totalWorkingDays }} <span class="fs-6 text-muted fw-normal">Days</span></h2>
+        <small class="text-muted" style="font-size: 12px;">in August 2026</small>
+      </div>
+    </div>
+
+    <!-- Card 2: Avg Working Hours -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-secondary fw-semibold small">Avg Working Hours</span>
+          <div class="p-2 rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center">
+            <mat-icon>schedule</mat-icon>
+          </div>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">{{ summary.averageWorkingHours }} <span class="fs-6 text-muted fw-normal">hrs/day</span></h2>
+        <small class="text-muted" style="font-size: 12px;">target: 8.0 hrs</small>
+      </div>
+    </div>
+
+    <!-- Card 3: Overtime Hours -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-secondary fw-semibold small">Total Overtime</span>
+          <div class="p-2 rounded-circle bg-purple bg-opacity-10 text-purple d-flex align-items-center justify-content-center">
+            <mat-icon>more_time</mat-icon>
+          </div>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">{{ summary.totalOvertimeHours }} <span class="fs-6 text-muted fw-normal">hrs</span></h2>
+        <small class="text-muted" style="font-size: 12px;">accumulated overtime</small>
+      </div>
+    </div>
+
+    <!-- Card 4: Compliance Rate -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-secondary fw-semibold small">Compliance Rate</span>
+          <div class="p-2 rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center">
+            <mat-icon>verified_user</mat-icon>
+          </div>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">{{ summary.complianceRate }}%</h2>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-success-subtle text-success font-monospace" style="font-size: 11px;">High Compliance</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TABS CONTROL BAR -->
+  <div class="d-flex align-items-center justify-content-between border-bottom mb-4">
+    <ul class="nav nav-tabs border-0 gap-3">
+      <li class="nav-item">
+        <button 
+          class="nav-link fw-semibold border-0 bg-transparent px-3 py-2 d-flex align-items-center gap-2"
+          [class.active]="activeTab === 'calendar'"
+          (click)="activeTab = 'calendar'"
+        >
+          <mat-icon class="fs-6">view_module</mat-icon> Monthly Attendance & Grid
+        </button>
+      </li>
+      <li class="nav-item">
+        <button 
+          class="nav-link fw-semibold border-0 bg-transparent px-3 py-2 d-flex align-items-center gap-2"
+          [class.active]="activeTab === 'audit'"
+          (click)="activeTab = 'audit'"
+        >
+          <mat-icon class="fs-6">history</mat-icon> History & Audit Trail Log
+        </button>
+      </li>
+    </ul>
+
+    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 mb-2" (click)="loadData()">
+      <mat-icon class="fs-6">refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  <!-- TAB 1: MONTHLY ATTENDANCE & GRID VIEW -->
+  <div *ngIf="activeTab === 'calendar'">
+    <!-- Filter Toolbar -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4">
+      <div class="row g-3 align-items-center">
+        <!-- Search Input -->
+        <div class="col-12 col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0 ps-3">
+              <mat-icon class="text-secondary fs-5">search</mat-icon>
+            </span>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (ngModelChange)="applyFilters()" 
+              placeholder="Search employee, ID, or department..." 
+              class="form-control border-0 bg-light py-2 shadow-none" />
+          </div>
+        </div>
+
+        <!-- Month & Year Selectors -->
+        <div class="col-6 col-md-2">
+          <select [(ngModel)]="selectedMonth" (change)="loadData()" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <select [(ngModel)]="selectedYear" (change)="loadData()" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <!-- Department Filter -->
+        <div class="col-6 col-md-2">
+          <select [(ngModel)]="filterDepartment" (change)="applyFilters()" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
+            <option value="">All Departments</option>
+            <option *ngFor="let d of departments" [value]="d">{{ d }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-6 col-md-2">
+          <select [(ngModel)]="filterStatus" (change)="applyFilters()" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
+            <option value="">All Statuses</option>
+            <option value="Present">Present</option>
+            <option value="WFH">WFH</option>
+            <option value="Half-Day">Half-Day</option>
+            <option value="Absent">Absent</option>
+            <option value="Leave">Leave</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3 px-4">Date & Employee</th>
+              <th class="py-3">Clock In</th>
+              <th class="py-3">Clock Out</th>
+              <th class="py-3">Hours Logged</th>
+              <th class="py-3">Status</th>
+              <th class="py-3">Location & IP Tag</th>
+              <th class="py-3 text-end px-4">Admin Override</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rec of filteredRecords">
+              <!-- Employee & Date -->
+              <td class="px-4">
+                <div>
+                  <h6 class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ rec.employeeName }}</h6>
+                  <small class="text-secondary" style="font-size: 11.5px;">{{ rec.date }} • {{ rec.department }}</small>
+                </div>
+              </td>
+
+              <!-- Clock In -->
+              <td class="fw-medium text-dark">
+                {{ rec.clockInTime ? (rec.clockInTime | date:'shortTime') : '--:--' }}
+              </td>
+
+              <!-- Clock Out -->
+              <td class="fw-medium text-dark">
+                {{ rec.clockOutTime ? (rec.clockOutTime | date:'shortTime') : '--:--' }}
+              </td>
+
+              <!-- Hours Logged -->
+              <td>
+                <span class="fw-bold text-dark">{{ rec.totalHours || 0 }} hrs</span>
+                <small *ngIf="rec.overtimeHours && rec.overtimeHours > 0" class="text-purple ms-1 font-monospace" style="font-size: 11px;">
+                  (+{{ rec.overtimeHours }}h OT)
+                </small>
+              </td>
+
+              <!-- Status Badge -->
+              <td>
+                <span 
+                  class="badge rounded-pill px-3 py-1 fw-semibold font-monospace"
+                  [class.bg-success-subtle]="rec.status === 'Present'"
+                  [class.text-success]="rec.status === 'Present'"
+                  [class.bg-info-subtle]="rec.status === 'WFH'"
+                  [class.text-info]="rec.status === 'WFH'"
+                  [class.bg-warning-subtle]="rec.status === 'Half-Day'"
+                  [class.text-warning]="rec.status === 'Half-Day'"
+                  [class.bg-danger-subtle]="rec.status === 'Absent'"
+                  [class.text-danger]="rec.status === 'Absent'"
+                  style="font-size: 11.5px;"
+                >
+                  {{ rec.status }}
+                </span>
+                <span *ngIf="rec.overrideFlag" class="badge bg-light text-secondary border ms-1" title="Manually modified by Admin">
+                  Override
+                </span>
+              </td>
+
+              <!-- IP & Location Tag -->
+              <td>
+                <small class="text-secondary d-block text-truncate" style="max-width: 180px; font-size: 11.5px;">
+                  📍 {{ rec.locationTag || 'HQ Office' }}
+                </small>
+                <small class="text-muted font-monospace" style="font-size: 10px;">{{ rec.ipAddress }}</small>
+              </td>
+
+              <!-- Admin Override Action -->
+              <td class="text-end px-4">
+                <button 
+                  class="btn btn-sm btn-outline-primary rounded-circle p-2"
+                  (click)="openOverrideModal(rec)"
+                  title="Admin Override & Corrections"
+                >
+                  <mat-icon class="fs-6">edit</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: HISTORY & AUDIT TRAIL LOG -->
+  <div *ngIf="activeTab === 'audit'">
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold mb-0 text-dark">Audit Trail & Correction Log</h5>
+        <span class="badge bg-light text-secondary border px-3 py-1 font-monospace" style="font-size: 11px;">
+          {{ auditLogs.length }} Entries Logged
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3 px-4">Timestamp</th>
+              <th class="py-3">Employee</th>
+              <th class="py-3">Modified By</th>
+              <th class="py-3">Status Change</th>
+              <th class="py-3">Modification Reason / Admin Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of auditLogs">
+              <td class="px-4 text-muted font-monospace" style="font-size: 12px;">
+                {{ log.timestamp | date:'medium' }}
+              </td>
+              <td class="fw-semibold text-dark">
+                {{ log.employeeName }}
+              </td>
+              <td>
+                <span class="badge bg-primary-subtle text-primary border rounded-pill px-3 py-1 font-monospace" style="font-size: 11px;">
+                  {{ log.modifiedBy }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-1 font-monospace" style="font-size: 12px;">
+                  <span class="text-secondary">{{ log.oldStatus || 'None' }}</span>
+                  <mat-icon class="fs-6 text-muted">arrow_forward</mat-icon>
+                  <span class="fw-bold text-success">{{ log.newStatus }}</span>
+                </div>
+              </td>
+              <td class="text-secondary style-13">
+                "{{ log.modificationReason }}"
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN OVERRIDE MODAL -->
+  <div *ngIf="showOverrideModal && selectedOverrideRecord" class="override-modal-overlay d-flex align-items-center justify-content-center p-3">
+    <div class="override-modal-card bg-white rounded-4 shadow-lg overflow-hidden border">
+      <!-- Header -->
+      <div class="p-3 bg-dark text-white d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-warning">edit_note</mat-icon>
+          <h6 class="mb-0 fw-bold">Admin Attendance Override</h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closeOverrideModal()"></button>
+      </div>
+
+      <!-- Form Body -->
+      <div class="p-4">
+        <p class="small text-secondary mb-3">Modifying record for <strong>{{ selectedOverrideRecord.employeeName }}</strong> ({{ selectedOverrideRecord.date }}).</p>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Attendance Status</label>
+          <select [(ngModel)]="overrideStatus" class="form-select">
+            <option value="Present">Present</option>
+            <option value="WFH">WFH (Work From Home)</option>
+            <option value="Half-Day">Half-Day</option>
+            <option value="Absent">Absent</option>
+            <option value="Leave">Leave</option>
+          </select>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold small">Clock In Time</label>
+            <input type="time" [(ngModel)]="overrideClockIn" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold small">Clock Out Time</label>
+            <input type="time" [(ngModel)]="overrideClockOut" class="form-control" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-danger">Modification Reason (Mandatory Audit Trail Note)*</label>
+          <textarea 
+            [(ngModel)]="overrideReason" 
+            placeholder="State why this override was performed (e.g., Client meeting offsite, system punch glitch)..." 
+            class="form-control" 
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-3 bg-light border-top d-flex align-items-center justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4" (click)="closeOverrideModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" (click)="submitOverride()" [disabled]="!overrideReason.trim()">
+          Save & Log Audit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

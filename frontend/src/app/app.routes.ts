@@ -6,6 +6,10 @@ import { RoleGuard } from './guards/role.guard';
 
 import { DashboardOverviewComponent } from './components/dashboard-overview/dashboard-overview.component';
 
+import { PayrollComponent } from './components/payroll/payroll.component';
+
+import { TimeToolsComponent } from './components/time-tools/time-tools.component';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -48,13 +52,13 @@ export const routes: Routes = [
       },
       {
         path: 'payroll',
-        component: EmployeeListComponent,
+        component: PayrollComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] },
       },
       {
         path: 'time-tools',
-        component: EmployeeListComponent,
+        component: TimeToolsComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
       },
