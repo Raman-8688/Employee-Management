@@ -4,6 +4,8 @@ import { EmployeeListComponent } from './components/employee-list/employee-list.
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
+import { DashboardOverviewComponent } from './components/dashboard-overview/dashboard-overview.component';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -31,10 +33,10 @@ export const routes: Routes = [
     component: DashboardComponent, // Use your existing DashboardComponent directly
     canActivate: [AuthGuard],
     children: [
-      { path: '', redirectTo: 'people', pathMatch: 'full' },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
       {
         path: 'home',
-        component: EmployeeListComponent,
+        component: DashboardOverviewComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
       },

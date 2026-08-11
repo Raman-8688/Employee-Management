@@ -1,0 +1,60 @@
+.dashboard-overview-container {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 70px);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+.hover-card {
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.hover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+.hover-bg-light:hover {
+  background-color: #f1f5f9;
+}
+
+.bg-purple {
+  background-color: #7c3aed !important;
+}
+
+.text-purple {
+  color: #7c3aed !important;
+}
+
+.bg-purple-subtle {
+  background-color: #f3e8ff !important;
+}
+
+.border-purple {
+  border-color: #ddd6fe !important;
+}
+
+.border-purple:hover {
+  background-color: #faf5ff !important;
+  border-color: #7c3aed !important;
+}
+
+.style-13 {
+  font-size: 13.5px;
+}
+
+.dept-stat-row {
+  transition: opacity 0.2s ease;
+}
+
+.dept-stat-row:hover {
+  opacity: 0.9;
+}
