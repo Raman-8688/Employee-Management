@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { Subscription } from 'rxjs';
 import { AiService, AiChatResponse } from '../../services/ai.service';
 import { TtsService } from '../../services/tts.service';
+import { SttService } from '../../services/stt.service';
 
 interface ChatMessage {
   sender: 'user' | 'ai';
@@ -19,9 +22,12 @@ interface ChatMessage {
   templateUrl: './ai-copilot.component.html',
   styleUrls: ['./ai-copilot.component.css'],
 })
-export class AiCopilotComponent implements OnInit {
+export class AiCopilotComponent implements OnInit, OnDestroy {
+  @Input() isFullPage = false;
+  
   isOpen = false;
   isLoading = false;
+  isListening = false;
   userMessage = '';
   selectedModel = 'meta/llama-3.1-8b-instruct';
   
@@ -43,12 +49,23 @@ export class AiCopilotComponent implements OnInit {
     },
   ];
 
+  private sttSub!: Subscription;
+  private transcriptSub!: Subscription;
+
   constructor(
     private aiService: AiService,
-    public ttsService: TtsService
+    public ttsService: TtsService,
+    public sttService: SttService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Check if current route is full page ai-copilot
+    if (this.router.url.includes('/ai-copilot')) {
+      this.isFullPage = true;
+      this.isOpen = true;
+    }
+
     this.aiService.getAvailableModels().subscribe({
       next: (res) => {
         if (res && res.data && res.data.length > 0) {
@@ -57,13 +74,37 @@ export class AiCopilotComponent implements OnInit {
       },
       error: () => {},
     });
+
+    // Subscribe to STT Microphone states
+    this.sttSub = this.sttService.isListening$.subscribe((listening) => {
+      this.isListening = listening;
+    });
+
+    this.transcriptSub = this.sttService.transcript$.subscribe((text) => {
+      if (text) {
+        this.userMessage = text;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.sttSub) this.sttSub.unsubscribe();
+    if (this.transcriptSub) this.transcriptSub.unsubscribe();
+    this.ttsService.stop();
+    this.sttService.stop();
   }
 
   toggleDrawer(): void {
-    this.isOpen = !this.isOpen;
-    if (!this.isOpen) {
-      this.ttsService.stop();
+    // If not in full page route, navigate to full page route
+    if (!this.router.url.includes('/ai-copilot')) {
+      this.router.navigate(['/dashboard/ai-copilot']);
+    } else {
+      this.isOpen = !this.isOpen;
     }
+  }
+
+  toggleMicrophone(): void {
+    this.sttService.toggle();
   }
 
   onFileSelected(event: any): void {
@@ -78,6 +119,10 @@ export class AiCopilotComponent implements OnInit {
   }
 
   sendMessage(): void {
+    if (this.isListening) {
+      this.sttService.stop();
+    }
+
     if ((!this.userMessage.trim() && !this.selectedFile) || this.isLoading) {
       return;
     }

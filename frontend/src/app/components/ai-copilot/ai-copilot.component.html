@@ -1,8 +1,9 @@
-<!-- Floating Trigger Button -->
+<!-- Persistent Floating Trigger Button (Bottom-Right) -->
 <button 
+  *ngIf="!isFullPage"
   class="btn btn-primary rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center copilot-trigger-btn"
   (click)="toggleDrawer()"
-  title="Nvidia AI HR Copilot"
+  title="Open Nvidia AI HR Copilot"
 >
   <mat-icon class="fs-3">smart_toy</mat-icon>
   <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
@@ -10,51 +11,71 @@
   </span>
 </button>
 
-<!-- Slide-Out Copilot Drawer -->
+<!-- Main Container (Full-Page or Drawer Mode) -->
 <div 
-  class="copilot-drawer shadow-lg border-start bg-white d-flex flex-column"
-  [class.open]="isOpen"
+  [class.copilot-fullpage]="isFullPage"
+  [class.copilot-drawer]="!isFullPage"
+  [class.open]="isOpen || isFullPage"
+  class="bg-white d-flex flex-column border-start shadow-lg"
 >
-  <!-- Drawer Header -->
+  <!-- Header Bar -->
   <div class="p-3 bg-dark text-white d-flex align-items-center justify-content-between">
-    <div class="d-flex align-items-center gap-2">
-      <mat-icon class="text-info">smart_toy</mat-icon>
+    <div class="d-flex align-items-center gap-3">
+      <div class="p-2 rounded-circle bg-primary bg-opacity-25 text-info d-flex align-items-center justify-content-center">
+        <mat-icon class="fs-3">smart_toy</mat-icon>
+      </div>
       <div>
-        <h6 class="mb-0 fw-bold">Nvidia AI HR Copilot</h6>
-        <small class="text-white-50" style="font-size: 11px;">Powered by Nvidia LLMs</small>
+        <h5 class="mb-0 fw-bold">Nvidia AI HR Copilot</h5>
+        <small class="text-white-50 small">Enterprise GenAI Employee & HR Assistant</small>
       </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" (click)="toggleDrawer()"></button>
+    
+    <div class="d-flex align-items-center gap-2">
+      <button 
+        *ngIf="!isFullPage" 
+        type="button" 
+        class="btn btn-sm btn-outline-light d-flex align-items-center gap-1" 
+        (click)="toggleDrawer()"
+        title="Open Full Page View"
+      >
+        <mat-icon class="fs-6">open_in_full</mat-icon>
+        <span class="d-none d-sm-inline">Full Page</span>
+      </button>
+      <button *ngIf="!isFullPage" type="button" class="btn-close btn-close-white" (click)="isOpen = false"></button>
+    </div>
   </div>
 
-  <!-- Model Selector Bar -->
-  <div class="p-2 bg-light border-bottom d-flex align-items-center justify-content-between px-3">
-    <small class="text-secondary fw-semibold">Model:</small>
-    <select [(ngModel)]="selectedModel" class="form-select form-select-sm w-auto border-0 bg-white shadow-sm fw-medium">
+  <!-- Model Selector Toolbar -->
+  <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <mat-icon class="text-secondary fs-5">tune</mat-icon>
+      <span class="text-secondary fw-semibold small">Active Nvidia Model:</span>
+    </div>
+    <select [(ngModel)]="selectedModel" class="form-select form-select-sm w-auto border-0 bg-white shadow-sm fw-medium px-3 py-2">
       <option *ngFor="let m of availableModels" [value]="m">
-        {{ m.split('/')[1] || m }}
+        {{ m }}
       </option>
     </select>
   </div>
 
   <!-- Quick Action Chips -->
-  <div class="p-2 border-bottom bg-white d-flex gap-1 overflow-x-auto text-nowrap px-3 scrollbar-hidden">
-    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('Suggest key goals for IT department employees')">
-      🎯 IT Department Goals
+  <div class="p-2 border-bottom bg-white d-flex gap-2 overflow-x-auto text-nowrap px-3 scrollbar-hidden">
+    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('Suggest key goals and career milestones for IT department employees')">
+      <mat-icon class="fs-6">flag</mat-icon> IT Department Goals
     </button>
-    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('Draft a formal promotion recommendation letter template')">
-      📝 Promotion Template
+    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('Draft a formal promotion recommendation letter template for an employee')">
+      <mat-icon class="fs-6">description</mat-icon> Promotion Template
     </button>
-    <button class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 text-xs" (click)="sendQuickChip('What are standard sick leave & compliance policies?')">
-      📜 HR Policies
+    <button class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 text-xs d-flex align-items-center gap-1" (click)="sendQuickChip('What are standard sick leave, remote work, and compliance policies?')">
+      <mat-icon class="fs-6">policy</mat-icon> HR Policies
     </button>
   </div>
 
-  <!-- Chat Messages Body -->
-  <div class="flex-grow-1 p-3 overflow-y-auto d-flex flex-column gap-3 chat-messages-container">
+  <!-- Messages Body -->
+  <div class="flex-grow-1 p-4 overflow-y-auto d-flex flex-column gap-3 chat-messages-container">
     <div 
       *ngFor="let msg of messages" 
-      class="d-flex flex-column"
+      class="d-flex flex-column mb-2"
       [class.align-items-end]="msg.sender === 'user'"
       [class.align-items-start]="msg.sender === 'ai'"
     >
@@ -66,56 +87,71 @@
         [class.text-dark]="msg.sender === 'ai'"
         [class.border]="msg.sender === 'ai'"
       >
-        <div class="d-flex align-items-center justify-content-between mb-1 gap-2">
-          <small class="fw-bold" [class.text-white-50]="msg.sender === 'user'" [class.text-secondary]="msg.sender === 'ai'">
-            {{ msg.sender === 'user' ? 'You' : 'Nvidia AI' }}
-          </small>
-          <span *ngIf="msg.modelUsed" class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 10px;">
-            {{ msg.modelUsed.split('/')[1] || msg.modelUsed }}
+        <div class="d-flex align-items-center justify-content-between mb-2 gap-3 border-bottom pb-1" [class.border-white-50]="msg.sender === 'user'">
+          <div class="d-flex align-items-center gap-1">
+            <mat-icon class="fs-6" *ngIf="msg.sender === 'ai'">smart_toy</mat-icon>
+            <mat-icon class="fs-6" *ngIf="msg.sender === 'user'">person</mat-icon>
+            <small class="fw-bold" [class.text-white-50]="msg.sender === 'user'" [class.text-secondary]="msg.sender === 'ai'">
+              {{ msg.sender === 'user' ? 'You' : 'Nvidia AI Copilot' }}
+            </small>
+          </div>
+          <span *ngIf="msg.modelUsed" class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 10.5px;">
+            {{ msg.modelUsed }}
           </span>
         </div>
 
-        <div class="message-text" style="white-space: pre-wrap; font-size: 13.5px; line-height: 1.5;">
+        <div class="message-text" style="white-space: pre-wrap; font-size: 14.5px; line-height: 1.6;">
           {{ msg.text }}
         </div>
 
-        <!-- Voice Reader Speaker Button for AI Messages -->
+        <!-- Voice Reader Speaker Button -->
         <div *ngIf="msg.sender === 'ai'" class="mt-2 pt-2 border-top d-flex justify-content-end">
           <button 
             type="button" 
-            class="btn btn-sm btn-link text-decoration-none text-primary p-0 d-flex align-items-center gap-1"
+            class="btn btn-sm btn-link text-decoration-none text-primary p-0 d-flex align-items-center gap-1 fw-medium"
             (click)="speakMessage(msg.text)"
-            title="Read Response Aloud"
+            title="Read Response Out Loud (Web Speech API)"
           >
             <mat-icon class="fs-6">volume_up</mat-icon>
-            <span style="font-size: 11px;">Listen</span>
+            <span style="font-size: 12px;">Listen</span>
           </button>
         </div>
       </div>
-      <small class="text-muted mt-1 px-1" style="font-size: 10px;">
+
+      <small class="text-muted mt-1 px-1" style="font-size: 11px;">
         {{ msg.timestamp | date:'shortTime' }}
       </small>
     </div>
 
-    <!-- Loading Indicator -->
-    <div *ngIf="isLoading" class="d-flex align-items-center gap-2 text-primary p-2">
+    <!-- AI Thinking Loading Indicator -->
+    <div *ngIf="isLoading" class="d-flex align-items-center gap-2 text-primary p-3 bg-light rounded-3 w-auto border">
       <div class="spinner-border spinner-border-sm" role="status"></div>
-      <small class="fw-medium">Nvidia AI is thinking...</small>
+      <small class="fw-semibold">Nvidia AI is analyzing prompt...</small>
     </div>
   </div>
 
-  <!-- Document Attachment Bar -->
-  <div *ngIf="selectedFile" class="px-3 py-2 bg-light border-top d-flex align-items-center justify-content-between">
+  <!-- File Attachment Preview Bar -->
+  <div *ngIf="selectedFile" class="px-4 py-2 bg-light border-top d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-2 text-truncate">
       <mat-icon class="text-primary">description</mat-icon>
-      <small class="fw-semibold text-truncate">{{ selectedFile.name }}</small>
+      <span class="fw-semibold text-dark small text-truncate">{{ selectedFile.name }}</span>
     </div>
     <button type="button" class="btn-close btn-close-sm" (click)="removeSelectedFile()"></button>
   </div>
 
-  <!-- Chat Input Footer -->
+  <!-- Microphone Recording Banner -->
+  <div *ngIf="isListening" class="px-4 py-2 bg-danger bg-opacity-10 text-danger border-top d-flex align-items-center justify-content-between animate-pulse">
+    <div class="d-flex align-items-center gap-2 fw-semibold small">
+      <mat-icon class="text-danger pulse-icon">mic</mat-icon>
+      <span>🎙️ Listening to your voice... Speak now!</span>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 text-xs" (click)="toggleMicrophone()">Stop</button>
+  </div>
+
+  <!-- Input Footer Toolbar -->
   <div class="p-3 border-top bg-white">
     <form (ngSubmit)="sendMessage()" class="d-flex align-items-center gap-2">
+      <!-- File Attachment Button -->
       <input 
         type="file" 
         #fileInput 
@@ -125,25 +161,41 @@
 
       <button 
         type="button" 
-        class="btn btn-outline-secondary btn-sm p-2 rounded-circle d-flex align-items-center justify-content-center"
+        class="btn btn-light btn-md rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary border"
         (click)="fileInput.click()"
         title="Attach HR Document for AI Analysis"
       >
         <mat-icon>attach_file</mat-icon>
       </button>
 
+      <!-- Microphone Voice Recording Button -->
+      <button 
+        type="button" 
+        class="btn btn-md rounded-circle p-2 d-flex align-items-center justify-content-center border"
+        [class.btn-danger]="isListening"
+        [class.btn-light]="!isListening"
+        [class.text-secondary]="!isListening"
+        (click)="toggleMicrophone()"
+        [title]="isListening ? 'Stop Recording' : 'Record Voice Input (Microphone)'"
+      >
+        <mat-icon [class.pulse-icon]="isListening">{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
+      </button>
+
+      <!-- Text Input Box -->
       <input 
         type="text" 
         [(ngModel)]="userMessage" 
         name="userMessage"
-        placeholder="Ask AI Copilot or type query..." 
-        class="form-control form-control-sm rounded-pill px-3"
+        placeholder="Ask AI Copilot or speak using microphone..." 
+        class="form-control form-control-md rounded-pill px-4"
         [disabled]="isLoading" />
 
+      <!-- Send Button -->
       <button 
         type="submit" 
-        class="btn btn-primary btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center"
+        class="btn btn-primary btn-md rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm"
         [disabled]="(!userMessage.trim() && !selectedFile) || isLoading"
+        title="Send Prompt"
       >
         <mat-icon>send</mat-icon>
       </button>

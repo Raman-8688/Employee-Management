@@ -31,7 +31,8 @@ export class SidebarComponent implements OnInit {
     { icon: 'insights', label: 'Performance', route: '/dashboard/performance' },
     { icon: 'badge', label: 'Personal Details', route: '/dashboard/personal' },
     { icon: 'work_history', label: 'Job & Reference', route: '/dashboard/job' },
-    { icon: 'description', label: 'Document', route: '/dashboard/document' }
+    { icon: 'description', label: 'Document', route: '/dashboard/document' },
+    { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' }
   ];
 
   constructor(private authService: AuthService) {}
