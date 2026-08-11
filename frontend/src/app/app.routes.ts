@@ -86,6 +86,15 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
       },
+      {
+        path: 'ai-copilot',
+        loadComponent: () =>
+          import('./components/ai-copilot/ai-copilot.component').then(
+            (m) => m.AiCopilotComponent
+          ),
+        canActivate: [RoleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+      },
     ],
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // Start with login
