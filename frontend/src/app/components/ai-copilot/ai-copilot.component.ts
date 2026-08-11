@@ -23,12 +23,14 @@ export class AiCopilotComponent implements OnInit {
   isOpen = false;
   isLoading = false;
   userMessage = '';
-  selectedModel = 'meta/llama-3.1-70b-instruct';
+  selectedModel = 'meta/llama-3.1-8b-instruct';
   
   availableModels: string[] = [
+    'meta/llama-3.1-8b-instruct',
     'meta/llama-3.1-70b-instruct',
-    'meta/llama-3.1-405b-instruct',
-    'mistralai/mixtral-8x22b-instruct-v0.1'
+    'meta/llama3-8b-instruct',
+    'mistralai/mistral-7b-instruct-v0.2',
+    'google/gemma-2-27b-it'
   ];
 
   selectedFile: File | null = null;
@@ -36,7 +38,7 @@ export class AiCopilotComponent implements OnInit {
     {
       sender: 'ai',
       text: 'Hello! I am your Nvidia AI HR Copilot. How can I assist you with employee evaluations, policy queries, or document analysis today?',
-      modelUsed: 'meta/llama-3.1-70b-instruct',
+      modelUsed: 'meta/llama-3.1-8b-instruct',
       timestamp: new Date(),
     },
   ];
