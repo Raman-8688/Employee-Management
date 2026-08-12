@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: employee-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/emp_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+nvidia:
+  ai:
+    api-key: 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
+    url: https://integrate.api.nvidia.com/v1/chat/completions
+    default-model: meta/llama-3.1-8b-instruct
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
