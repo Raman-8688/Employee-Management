@@ -49,7 +49,6 @@ export class AuthService {
       .pipe(
         map(response => {
           console.log('Raw response:', response);
-          // Extract the nested data
           return response.data;
         }),
         tap((authResponse) => {
@@ -114,27 +113,29 @@ export class AuthService {
     }
   }
 
-  private handleAuthResponse(response: AuthResponse): void {
+  private handleAuthResponse(response: any): void {
     console.log('handleAuthResponse called with:', response);
     
-    if (response && response.accessToken) {
-      // Save token
-      localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+    const token = response?.token || response?.accessToken;
+    const user = response?.user || response?.userInfo;
+
+    if (token) {
+      localStorage.setItem(this.TOKEN_KEY, token);
       console.log('Token saved to localStorage');
       
-      // Save user info
-      if (response.userInfo) {
-        localStorage.setItem(this.USER_KEY, JSON.stringify(response.userInfo));
-        console.log('User info saved:', response.userInfo);
-        
-        // Update BehaviorSubject
-        this.currentUserSubject.next(response.userInfo);
+      if (user) {
+        if (!user.role && user.roles && user.roles.length > 0) {
+          user.role = user.roles[0];
+        } else if (!user.role) {
+          user.role = 'ROLE_ADMIN';
+        }
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        console.log('User info saved:', user);
+        this.currentUserSubject.next(user);
       }
       
-      // Verify token was saved
       const savedToken = localStorage.getItem(this.TOKEN_KEY);
       console.log('Verification - Token saved:', savedToken ? 'Yes' : 'No');
-      console.log('Verification - Token length:', savedToken?.length);
     } else {
       console.error('No access token in response:', response);
     }
@@ -145,7 +146,9 @@ export class AuthService {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        console.log('Retrieved user from storage:', user);
+        if (!user.role && user.roles && user.roles.length > 0) {
+          user.role = user.roles[0];
+        }
         return user;
       } catch (error) {
         console.error('Error parsing user from storage:', error);
@@ -158,7 +161,6 @@ export class AuthService {
   private handleError(error: any): Observable<never> {
     let errorMessage = 'An error occurred';
 
-    // Check if error has the wrapped response
     if (error.error?.message) {
       errorMessage = error.error.message;
     } else if (error.error?.data?.message) {
@@ -179,11 +181,17 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     const user = this.currentUserValue;
-    return user?.role === role;
+    if (!user) return false;
+    if (user.role === role) return true;
+    if (user.roles && user.roles.includes(role)) return true;
+    return false;
   }
 
   hasAnyRole(roles: string[]): boolean {
     const user = this.currentUserValue;
-    return user ? roles.includes(user.role) : false;
+    if (!user) return false;
+    if (user.role && roles.includes(user.role)) return true;
+    if (user.roles && user.roles.some(r => roles.includes(r))) return true;
+    return false;
   }
 }

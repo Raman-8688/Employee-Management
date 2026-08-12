@@ -5,6 +5,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: string;
+  roles?: string[];
 }
 
 export interface LoginRequest {
@@ -21,10 +22,12 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  accessToken: string;  
-  tokenType: string;
-  expiresIn: number;
-  userInfo: User;
+  token?: string;
+  accessToken?: string;
+  tokenType?: string;
+  expiresIn?: number;
+  user?: User;
+  userInfo?: User;
 }
 
 export interface RefreshTokenRequest {
