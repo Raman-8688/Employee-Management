@@ -1,9 +1,7 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
     <div class="logo">
-      
-      <!-- <mat-icon class="logo-icon">apartment/business/domain/location_city/business</mat-icon> -->
-        <mat-icon class="logo-icon">location_city</mat-icon>
+      <mat-icon class="logo-icon">location_city</mat-icon>
       <span class="logo-text" *ngIf="!isCollapsed">winfo</span>
     </div>
   </div>
@@ -46,7 +44,7 @@
 
         <ul class="nav-list" *ngIf="activeCategory">
           <li *ngFor="let sub of activeCategory.subItems" class="nav-item">
-            <a [routerLink]="sub.route" routerLinkActive="active" class="nav-link sub-link">
+            <a [routerLink]="sub.route" [queryParams]="sub.queryParams" routerLinkActive="active" class="nav-link sub-link">
               <mat-icon class="nav-icon">{{ sub.icon }}</mat-icon>
               <span class="nav-label">{{ sub.label }}</span>
               <span class="badge" *ngIf="sub.badge">{{ sub.badge }}</span>

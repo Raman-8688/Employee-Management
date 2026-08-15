@@ -8,6 +8,7 @@ export interface SubMenuItem {
   icon: string;
   label: string;
   route: string;
+  queryParams?: any;
   badge?: number;
 }
 
@@ -16,6 +17,7 @@ export interface MenuItem {
   icon: string;
   label: string;
   route?: string;
+  queryParams?: any;
   badge?: number;
   subItems?: SubMenuItem[];
 }
@@ -38,12 +40,13 @@ export class SidebarComponent implements OnInit {
       id: 'tasks',
       icon: 'task_alt',
       label: 'Tasks & Projects',
-      badge: 4,
+      badge: 5,
       subItems: [
-        { icon: 'view_kanban', label: 'Kanban Board', route: '/dashboard/tasks' },
-        { icon: 'view_list', label: 'Backlog & Tasks', route: '/dashboard/tasks' },
-        { icon: 'history_toggle_off', label: 'Time Tracking Logs', route: '/dashboard/tasks' },
-        { icon: 'query_stats', label: 'Sprint Analytics', route: '/dashboard/tasks' }
+        { icon: 'view_kanban', label: 'Kanban Board', route: '/dashboard/tasks', queryParams: { view: 'KANBAN' } },
+        { icon: 'assignment_ind', label: 'Backlog & My Work', route: '/dashboard/tasks', queryParams: { view: 'MY_WORK' } },
+        { icon: 'history_toggle_off', label: 'Time Tracking Logs', route: '/dashboard/tasks', queryParams: { view: 'TIME_LOGS' } },
+        { icon: 'query_stats', label: 'Sprint Analytics', route: '/dashboard/tasks', queryParams: { view: 'ANALYTICS' } },
+        { icon: 'school', label: 'Learnings & Best Practices', route: '/dashboard/learnings', queryParams: { view: 'LEARNINGS' } }
       ]
     },
     {

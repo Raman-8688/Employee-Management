@@ -110,6 +110,16 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
       },
+      {
+        path: 'learnings',
+        loadComponent: () =>
+          import('./components/task-board/task-board.component').then(
+            (m) => m.TaskBoardComponent
+          ),
+        canActivate: [RoleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+      },
+
     ],
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // Start with login

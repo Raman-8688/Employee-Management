@@ -48,6 +48,20 @@ export interface TaskItem {
   timeLogs?: TaskTimeLog[];
 }
 
+export interface TaskLearning {
+  id?: number;
+  taskId?: number;
+  taskTitle?: string;
+  employeeId?: number;
+  employeeName?: string;
+  title: string;
+  category: 'TECHNICAL' | 'ARCHITECTURE' | 'SECURITY' | 'PROCESS';
+  content: string;
+  attachmentUrl?: string;
+  fileType?: string;
+  createdAt?: string;
+}
+
 export interface SprintMetrics {
   totalTasks: number;
   completedTasks: number;
@@ -100,6 +114,11 @@ export class TaskService {
     return this.http.get<ApiResponse<TaskItem[]>>(`${this.baseUrl}`, { params });
   }
 
+  getMyTasks(assigneeId: number): Observable<ApiResponse<TaskItem[]>> {
+    const params = new HttpParams().set('assigneeId', assigneeId.toString());
+    return this.http.get<ApiResponse<TaskItem[]>>(`${this.baseUrl}/my-tasks`, { params });
+  }
+
   getTaskById(id: number): Observable<ApiResponse<TaskItem>> {
     return this.http.get<ApiResponse<TaskItem>>(`${this.baseUrl}/${id}`);
   }
@@ -108,18 +127,25 @@ export class TaskService {
     return this.http.post<ApiResponse<TaskItem>>(`${this.baseUrl}`, task);
   }
 
-  updateTask(id: number, task: TaskItem): Observable<ApiResponse<TaskItem>> {
-    return this.http.put<ApiResponse<TaskItem>>(`${this.baseUrl}/${id}`, task);
+  updateTask(id: number, task: TaskItem, userId?: number, userRole?: string): Observable<ApiResponse<TaskItem>> {
+    let params = new HttpParams();
+    if (userId) params = params.set('userId', userId.toString());
+    if (userRole) params = params.set('userRole', userRole);
+    return this.http.put<ApiResponse<TaskItem>>(`${this.baseUrl}/${id}`, task, { params });
   }
 
-  updateTaskStatus(id: number, status: string): Observable<ApiResponse<TaskItem>> {
-    return this.http.patch<ApiResponse<TaskItem>>(`${this.baseUrl}/${id}/status`, null, {
-      params: { status }
-    });
+  updateTaskStatus(id: number, status: string, userId?: number, userRole?: string): Observable<ApiResponse<TaskItem>> {
+    let params = new HttpParams().set('status', status);
+    if (userId) params = params.set('userId', userId.toString());
+    if (userRole) params = params.set('userRole', userRole);
+    return this.http.patch<ApiResponse<TaskItem>>(`${this.baseUrl}/${id}/status`, null, { params });
   }
 
-  deleteTask(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
+  deleteTask(id: number, userId?: number, userRole?: string): Observable<ApiResponse<void>> {
+    let params = new HttpParams();
+    if (userId) params = params.set('userId', userId.toString());
+    if (userRole) params = params.set('userRole', userRole);
+    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`, { params });
   }
 
   // Subtasks
@@ -164,5 +190,26 @@ export class TaskService {
 
   getEmployeeAnalytics(employeeId: number): Observable<ApiResponse<EmployeeTaskAnalytics>> {
     return this.http.get<ApiResponse<EmployeeTaskAnalytics>>(`${this.baseUrl}/analytics/employee/${employeeId}`);
+  }
+
+  // Task Learnings & Best Practices
+  getLearnings(category?: string, query?: string): Observable<ApiResponse<TaskLearning[]>> {
+    let params = new HttpParams();
+    if (category) params = params.set('category', category);
+    if (query) params = params.set('query', query);
+    return this.http.get<ApiResponse<TaskLearning[]>>(`${this.baseUrl}/learnings`, { params });
+  }
+
+  createLearning(learning: TaskLearning): Observable<ApiResponse<TaskLearning>> {
+    return this.http.post<ApiResponse<TaskLearning>>(`${this.baseUrl}/learnings`, learning);
+  }
+
+  uploadLearningAttachment(file: File): Observable<ApiResponse<{ url: string; fileUrl: string; fileType: string; originalName: string }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<{ url: string; fileUrl: string; fileType: string; originalName: string }>>(
+      `${this.baseUrl}/learnings/upload`,
+      formData
+    );
   }
 }
