@@ -24,6 +24,7 @@ export class SidebarComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard/home' },
+    { icon: 'task_alt', label: 'Tasks & Projects', route: '/dashboard/tasks', badge: 4 },
     { icon: 'groups', label: 'People', route: '/dashboard/people', badge: 12 },
     { icon: 'payments', label: 'Payroll', route: '/dashboard/payroll' },
     { icon: 'schedule', label: 'Time Tools', route: '/dashboard/time-tools' },
@@ -32,9 +33,9 @@ export class SidebarComponent implements OnInit {
     { icon: 'badge', label: 'Personal Details', route: '/dashboard/personal' },
     { icon: 'work_history', label: 'Job & Reference', route: '/dashboard/job' },
     { icon: 'description', label: 'Document', route: '/dashboard/document' },
-    { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' },
-    { icon: 'task_alt', label: 'Tasks & Projects', route: '/dashboard/tasks', badge: 4 }
+    { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' }
   ];
+
 
   constructor(private authService: AuthService) {}
 
