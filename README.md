@@ -1,151 +1,216 @@
-# 🏢 Enterprise Employee Management System (EMS)
+# 🏢 Winfo360 Enterprise ERP & Microservices Platform
 
-An MNC-grade, production-ready **Employee Management & HR Operating System** built with **Spring Boot 3**, **Angular 19**, **Nvidia AI (GenAI LLMs)**, and **PostgreSQL**.
-
----
-
-## 🚀 Key Modules & Highlights
-
-### 🤖 1. Nvidia AI HR Copilot & Document Intelligence
-* **Multi-Model Resiliency Engine:** Integrates with Nvidia AI (`integrate.api.nvidia.com`) with automatic fallback between models:
-  * `meta/llama-3.1-8b-instruct` (Primary 100% Verified)
-  * `meta/llama-3.1-70b-instruct`
-  * `mistralai/mistral-7b-instruct-v0.2`
-  * `google/gemma-2-27b-it`
-* **Automated Performance Reviews:** One-click automated performance appraisal evaluations generated for employees based on profile data.
-* **HR Document Analysis:** Upload text/PDF/CSV documents for instant AI summarizing and policy Q&A.
-* **Microphone Voice Assistant (Speech-to-Text 🎙️):** Integrated Web Speech Recognition API (`SpeechRecognition`) for real-time voice input.
-* **Voice Speaker (Text-to-Speech 🔊):** Integrated Web Speech API (`speechSynthesis`) so AI responses can be listened to out loud.
-* **ChatGPT/Claude-Style Input Toolbar:** Sleek input bar combining model dropdown, file attachment button, microphone recorder, and send button.
-
-### 📊 2. Executive Dashboard Overview
-* **Top KPI Summary Cards:** Active Headcount, Onboarding, Offboarding, and Total Monthly Payroll Outflow.
-* **Department Distribution Widget:** Department headcount breakdown, percentage ratios, and monthly salary budget progress bars.
-* **Quick Action Shortcuts & Recent Activity Feed:** Instant access to adding recruits, AI appraisals, payroll, documents, and real-time system audit feeds.
-
-### 💵 3. Payroll Management Module
-* **Automated Calculations:** Itemized breakdown of Base Salary, Deductions (10% standard tax/PF calculation), and Net Payable Salary.
-* **Payment Status Tracking:** Color-coded status badges (`Paid`, `Processing`, `Pending`).
-* **Payslip Generator:** Downloadable itemized payslips (`Payslip_Name_August2026.txt`) generated on the fly.
-* **Batch Payroll Processing:** One-click batch payroll execution for all pending employees.
-
-### ⏱️ 4. Time Tools & Attendance Module
-* **Live Punch Clock Widget:** Interactive 🟢 Clock In / 🔴 Clock Out widget with IP and location tagging.
-* **Monthly Attendance & Grid View:** Detailed calendar grid with daily hours, break times, overtime tracking, and status badges (`Present`, `Absent`, `WFH`, `Half-Day`, `Leave`).
-* **History & Audit Trail Log:** Complete audit log tracking admin manual overrides, status changes, and modification notes.
-* **Admin Override Modal:** Admin modal to override attendance times/statuses with mandatory audit log note!
-
-### 🖼️ 5. Media Management & WhatsApp-Style Profile Photo Lightbox
-* **Multipart Storage:** Server-side file upload serving static images from `/uploads/profile-images/`.
-* **WhatsApp-Style Photo Lightbox:** Clicking any employee's avatar in the table opens a full-screen dark backdrop modal displaying the high-res photo with an instant **"📷 Change Photo"** button.
-
-### 🛡️ 6. Enterprise Security & Architecture Patterns
-* **JWT Stateless Authentication:** Secure token-based access with role-based authorization (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_USER`).
-* **POST-Based Encrypted Payload Pattern:** Sensitive query criteria are sent via encrypted HTTPS POST bodies to prevent parameter leakage in server access logs and URLs.
-* **Reusable Confirm Dialog Service:** Async `ConfirmDialogService` replacing default browser confirm dialogs.
+An MNC-grade, resilient, multi-module **Enterprise Cloud Platform** built with **Spring Boot 3.3**, **Spring Cloud (Eureka & API Gateway)**, **PostgreSQL**, **Nvidia AI (GenAI LLMs)**, and **Angular 19** featuring an Amazon-style sliding multi-level navigation interface.
 
 ---
 
-## 🛠️ Technology Stack
+## 🌟 Executive Summary & Enterprise Value Proposition
 
-| Layer | Technology |
-| :--- | :--- |
-| **Backend Framework** | Java 17, Spring Boot 3.3.x, Spring Security, Spring Data JPA |
-| **Database** | PostgreSQL |
-| **AI Integration** | Nvidia AI Open-AI API (`integrate.api.nvidia.com`) |
-| **Frontend Framework** | Angular 19 (Standalone Components, RxJS) |
-| **UI & Styling** | Bootstrap 5.3, Angular Material Icons |
-| **Speech APIs** | Web Speech API (`SpeechRecognition` & `SpeechSynthesis`) |
+**Winfo360 Enterprise Platform** replaces fragmented corporate tools by unifying **Workforce Operations**, **Jira-Style Sprint & Time Tracking**, **Nvidia GenAI Copilot Intelligence**, and an **Enterprise Application & Project Knowledge Hub** across organizational domain vertical suites (such as Asset Management System - AMS, Pharma Clinical Research, and Construction ERP).
 
 ---
 
-## 📁 Repository Directory Structure
+## 🏗️ Microservices Ecosystem Topology
 
 ```
-Employee-Management/
+                                  +-----------------------+
+                                  |    Angular 19 SPA     |
+                                  | (http://localhost:4200)|
+                                  +-----------+-----------+
+                                              |
+                                              v
+                                  +-----------------------+
+                                  |  Spring Cloud Gateway |
+                                  | (http://localhost:8080)|
+                                  +-----------+-----------+
+                                              |
+                        +---------------------+---------------------+
+                        |                     |                     |
+                        v                     v                     v
+              +-------------------+ +-------------------+ +-------------------+ +-----------------------+
+              |   auth-service    | |  employee-service | |   task-service    | |project-knowledge-service|
+              | (Port: 8081)      | | (Port: 8082)      | | (Port: 8083)      | | (Port: 8084)          |
+              | DB: auth_db       | | DB: emp_db        | | DB: task_db       | | DB: project_knowledge_db|
+              +-------------------+ +-------------------+ +-------------------+ +-----------------------+
+                        ^                     ^                     ^                     ^
+                        +---------------------+---------------------+---------------------+
+                                              |
+                                  +-----------+-----------+
+                                  |    Eureka Registry    |
+                                  | (http://localhost:8761)|
+                                  +-----------------------+
+```
+
+---
+
+## 💎 Core Pillars & Key Features
+
+### 🏢 1. Enterprise Application & Project Knowledge Hub (`project-knowledge-service`)
+- **Port:** `8084` | **Dedicated Database:** `project_knowledge_db`
+- **Domain Project Catalog:** Comprehensive tracking of enterprise projects across **AMS (Asset Management)**, **Pharma Clinical Research**, **Construction ERP**, and **General Enterprise**.
+- **Project 360° Inspector:** Deep architectural inspection with 5 dedicated tabs:
+  1. *Tech Stack & Architecture:* Frontend, Backend, Database, DevOps, and AI component registry.
+  2. *Database & Schemas Inventory:* Tables, column summaries, and stored procedures used (e.g. `sp_calculate_depreciation`, `sp_fda_safety_audit`).
+  3. *Screens & Submenus Registry:* Registered modules, Angular component trees, and submenu paths.
+  4. *API Endpoints Registry:* REST endpoints list with HTTP method badges (`GET`, `POST`, `PUT`, `DELETE`).
+  5. *Architecture Documents Repository:* File repository with upload & download support for PDFs, specifications, and architecture diagrams under `/project-docs/`.
+- **Project Registration Wizard:** Multi-step onboarding form allowing architects and leads to document new projects from scratch.
+
+### 📌 2. Jira-Style Task Management, Velocity & Time Tracking (`task-service`)
+- **Port:** `8083` | **Dedicated Database:** `task_db`
+- **Interactive Kanban Board:** Drag-and-drop status transitions (`TO DO`, `IN PROGRESS`, `IN REVIEW`, `DONE`) with checklist progress indicators.
+- **Automated Task Duration Calculation:** Moving a task to `DONE` automatically calculates elapsed work hours between `createdAt` and completion timestamp, persisting an automated ledger log to accurately track velocity.
+- **Task Learnings & Best Practices Knowledge Base:** Technical knowledge repository with multi-part file attachment support (PDF, DOCX, PNG, JPG) stored under `/uploads/learnings/`.
+- **Role-Based Access Control (RBAC):** Standard employees can view the company board, but can only edit/move tasks assigned to them. Admins & Managers retain full CRUD authority.
+
+### 🤖 3. Nvidia AI GenAI Copilot & Document Intelligence (`employee-service`)
+- **Port:** `8082` | **Dedicated Database:** `emp_db`
+- **Multi-Model Resiliency Engine:** Automatic fallback across Nvidia AI models (`meta/llama-3.1-8b-instruct`, `meta/llama-3.1-70b-instruct`, `mistralai/mistral-7b-instruct-v0.2`, `google/gemma-2-27b-it`).
+- **Voice Assistant (STT & TTS):** Integrated Web Speech API (`SpeechRecognition` & `SpeechSynthesis`) for real-time hands-free voice interaction.
+- **Automated Performance Appraisals:** One-click AI evaluation generator based on employee performance data.
+- **Document Analysis Engine:** PDF/CSV document parsing for instant AI policy summaries.
+
+### 👥 4. Workforce Directory, Attendance Clock & Audit Ledger
+- **Live Attendance Clock:** Interactive 🟢 Clock In / 🔴 Clock Out widget with IP and geo-location tracking.
+- **Monthly Attendance Grid:** Calendar view with daily working hours, WFH, overtime tracking, and status badges.
+- **Admin Override & Audit Trail:** Secure override modal for attendance corrections with mandatory audit justification notes.
+- **WhatsApp-Style Profile Photo Lightbox:** Avatar lightbox modal with high-res file upload preview.
+
+### 💵 5. Payroll Management Engine
+- **Itemized Payroll Calculation:** Base salary breakdown, itemized 10% tax/PF deductions, and net payable salary.
+- **Payslip Generator:** Instant text payslip file generator (`Payslip_August2026.txt`).
+- **Batch Processing:** One-click batch payroll execution.
+
+---
+
+## 🗄️ Microservices Database Isolation Matrix
+
+Every microservice maintains strict database isolation for enterprise compliance:
+
+| Microservice | Port | Service ID | Dedicated Database | Scope & Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| `auth-service` | `8081` | `AUTH-SERVICE` | `auth_db` | User credentials, security roles (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_EMPLOYEE`), JWT tokens |
+| `employee-service` | `8082` | `EMPLOYEE-SERVICE` | `emp_db` | Employee profiles, payroll records, attendance logs, Nvidia AI copilot engine |
+| `task-service` | `8083` | `TASK-SERVICE` | `task_db` | Tasks, subtask checklists, time logs, sprint velocity metrics, learnings attachments |
+| **`project-knowledge-service`** | **`8084`** | **`PROJECT-KNOWLEDGE-SERVICE`** | **`project_knowledge_db`** | **Enterprise project catalog, tech stacks, table schemas, stored procedures, screens, APIs & docs** |
+
+---
+
+## 🛠️ Technology Stack & Rationale
+
+| Layer | Technology | Rationale |
+| :--- | :--- | :--- |
+| **Architecture** | Spring Cloud Microservices | Decentralized, domain-driven microservices for scalable organizational growth |
+| **Service Discovery** | Netflix Eureka (`service-registry`) | Dynamic service registry enabling zero-downtime microservice registration |
+| **API Gateway** | Spring Cloud Gateway (`api-gateway`) | Centralized ingress routing, CORS deduplication, and request predicates |
+| **Backend Framework** | Java 17, Spring Boot 3.3.x, Spring Data JPA | Industrial performance, strong typing, and enterprise JPA abstractions |
+| **Database Systems** | PostgreSQL 15+ (H2 Fallback Profiles) | Production relational persistence with JSONB and transaction safety |
+| **Security** | Spring Security 6 & JJWT 0.12.5 | Stateless JWT authentication and role-based route protection |
+| **AI Copilot** | Nvidia GenAI API (`integrate.api.nvidia.com`) | State-of-the-art LLM reasoning with automated fallback models |
+| **Frontend Framework** | Angular 19 (Standalone Components) | Type-safe, modular SPA architecture with RxJS reactive state streams |
+| **Navigation Style** | Amazon-Style Sliding Submenus | Two-panel navigation with smooth CSS transitions and `← MAIN MENU` header |
+
+---
+
+## 📁 Project Directory Structure
+
+```
+Winfo360-Enterprise-Platform/
 ├── backend/
-│   ├── src/main/java/com/employee/backend/
-│   │   ├── config/             # Security & Web MVC configurations
-│   │   ├── controller/         # REST Controllers (Auth, Employee, AI, Attendance)
-│   │   ├── dto/                # Data Transfer Objects
-│   │   ├── entity/             # JPA Entities (Employee, AttendanceRecord, AuditLog)
-│   │   ├── reopository/        # Spring Data JPA Repositories
-│   │   ├── security/           # JWT Filters & Entry Points
-│   │   └── service/            # Business Logic Services & Nvidia AI Engine
-│   └── src/main/resources/
-│       ├── application.properties
-│       └── application-secret.properties  # Secret keys (Git-ignored)
+│   ├── pom.xml                                 # Root Maven Multi-Module POM
+│   ├── common-library/                         # Shared DTOs (ApiResponse, UserPrincipal)
+│   ├── service-registry/                       # Eureka Server (Port 8761)
+│   ├── api-gateway/                            # Spring Cloud Gateway Ingress (Port 8080)
+│   ├── auth-service/                           # JWT Authentication Service (Port 8081)
+│   ├── employee-service/                       # Employees, Payroll, AI Copilot Service (Port 8082)
+│   ├── task-service/                           # Jira Tasks, Sprint Velocity Service (Port 8083)
+│   └── project-knowledge-service/              # Enterprise Project Hub Service (Port 8084)
 └── frontend/
     ├── src/app/
-    │   ├── components/         # Angular Standalone Components
-    │   │   ├── ai-copilot/
-    │   │   ├── auth/
-    │   │   ├── dashboard/
-    │   │   ├── dashboard-overview/
-    │   │   ├── employee-list/
-    │   │   ├── payroll/
-    │   │   ├── sidebar/
-    │   │   └── time-tools/
-    │   ├── services/           # Angular HTTP Services (Auth, Employee, AI, TTS, STT)
-    │   └── shared/             # Reusable Confirm Dialog & Utilities
+    │   ├── components/
+    │   │   ├── ai-copilot/                     # Nvidia GenAI Voice & Text Copilot
+    │   │   ├── auth/                           # Login & Register Screens
+    │   │   ├── dashboard/                      # Dashboard Container
+    │   │   ├── dashboard-overview/             # Executive Overview Widgets
+    │   │   ├── employee-list/                  # Employee Directory & Profile Lightbox
+    │   │   ├── payroll/                        # Payroll Engine & Payslip Generator
+    │   │   ├── project-knowledge/              # Projects Directory, 360 Inspector & Wizard
+    │   │   ├── sidebar/                        # Amazon-Style Sliding Navigation
+    │   │   ├── task-board/                     # Jira Kanban, Backlog, Time Logs & Learnings
+    │   │   └── time-tools/                     # Attendance Clock & Audit Ledger
+    │   ├── services/                           # Reactive HTTP API Services
+    │   └── app.routes.ts                       # Lazy-Loaded Route Mappings
 ```
 
 ---
 
-## ⚡ Getting Started & Local Setup
+## ⚡ Getting Started & Launch Sequence
 
 ### Prerequisites
-- **Java 17 JDK**
-- **Node.js (v18+)** and `npm` / `npx`
-- **PostgreSQL Database** running on `localhost:5432` with database name `emp_db`
+1. **Java 17 JDK** installed and configured in `PATH`.
+2. **Node.js (v18+)** & `npm` / `npx`.
+3. **PostgreSQL Database** running on `localhost:5432` with databases created: `auth_db`, `emp_db`, `task_db`, `project_knowledge_db` *(Or use fallback H2 embedded profile)*.
 
 ---
 
-### 1. Backend Setup (Spring Boot)
+### Step-by-Step Startup Sequence
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Verify secret configuration file `src/main/resources/application-secret.properties`:
-   ```properties
-   nvidia.ai.api-key=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
-   nvidia.ai.url=https://integrate.api.nvidia.com/v1/chat/completions
-   nvidia.ai.default-model=meta/llama-3.1-8b-instruct
-   ```
-3. Build and compile the backend:
-   ```bash
-   mvnw.cmd compile
-   ```
-4. Run the Spring Boot Application:
-   ```bash
-   mvnw.cmd spring-boot:run
-   ```
-   *The backend runs on `http://localhost:8080`.*
+#### 1. Compile Backend Microservices
+```bash
+cd backend
+mvnw.cmd compile
+```
 
----
+#### 2. Start Microservices in Order
 
-### 2. Frontend Setup (Angular)
+1. **Service Registry (Eureka)**:
+   ```bash
+   cd backend/service-registry
+   ..\mvnw.cmd spring-boot:run
+   ```
+   *Dashboard available at `http://localhost:8761`.*
 
-1. Navigate to the frontend directory:
+2. **API Gateway**:
    ```bash
-   cd frontend
+   cd backend/api-gateway
+   ..\mvnw.cmd spring-boot:run
    ```
-2. Install dependencies:
+   *Ingress Gateway runs on `http://localhost:8080`.*
+
+3. **Auth Service**:
    ```bash
-   npm install
+   cd backend/auth-service
+   ..\mvnw.cmd spring-boot:run
    ```
-3. Run the development server:
+4. **Employee Service**:
    ```bash
-   npm start
+   cd backend/employee-service
+   ..\mvnw.cmd spring-boot:run
    ```
-4. Open `http://localhost:4200` in your web browser.
+5. **Task Service**:
+   ```bash
+   cd backend/task-service
+   ..\mvnw.cmd spring-boot:run
+   ```
+6. **Project Knowledge Service**:
+   ```bash
+   cd backend/project-knowledge-service
+   ..\mvnw.cmd spring-boot:run
+   ```
+
+#### 3. Start Angular Frontend SPA
+```bash
+cd frontend
+npm install
+npm start
+```
+*Access Winfo360 Enterprise Platform at `http://localhost:4200`.*
 
 ---
 
 ## 🔑 Default Credentials
 
-The system automatically seeds initial admin credentials into the database on startup:
+The platform auto-seeds initial administrator access on startup:
 
 - **Role:** Administrator (`ROLE_ADMIN`)
 - **Username:** `admin`
@@ -153,22 +218,21 @@ The system automatically seeds initial admin credentials into the database on st
 
 ---
 
-## 🔗 Key API Endpoints
+## 🔗 Gateway Ingress API Registry (Port `8080`)
 
-| Method | Endpoint | Description | Auth Required |
+| Method | Ingress Route Path | Microservice Target | Purpose |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/login` | User login & JWT token generation | No |
-| `GET` | `/employee/findAll` | Fetch all employees | Yes |
-| `POST` | `/employee/upload-image` | Upload profile image (Multipart) | Yes |
-| `POST` | `/api/ai/chat` | AI Copilot Chat | Yes |
-| `POST` | `/api/ai/performance-review` | Generate automated AI performance evaluation | Yes |
-| `POST` | `/api/ai/analyze-document` | Analyze uploaded document via AI | Yes |
-| `GET` | `/api/attendance/summary` | Fetch monthly attendance KPI metrics | Yes |
-| `POST` | `/api/attendance/clock-in` | Punch-in real-time attendance | Yes |
-| `PUT` | `/api/attendance/override/{id}` | Admin override attendance & log audit trail | Yes (Admin) |
+| `POST` | `/auth/login` | `AUTH-SERVICE` | User authentication & JWT issuance |
+| `GET` | `/employee/findAll` | `EMPLOYEE-SERVICE` | Fetch employee directory |
+| `POST` | `/api/ai/chat` | `EMPLOYEE-SERVICE` | Nvidia GenAI Copilot stream |
+| `GET` | `/api/tasks` | `TASK-SERVICE` | Fetch tasks & backlog |
+| `POST` | `/api/tasks/learnings/upload` | `TASK-SERVICE` | Upload task learning attachment |
+| `GET` | `/api/projects` | `PROJECT-KNOWLEDGE-SERVICE` | Fetch enterprise projects directory |
+| `GET` | `/api/projects/{id}` | `PROJECT-KNOWLEDGE-SERVICE` | Fetch Project 360° Inspector details |
+| `POST` | `/api/projects/{id}/documents/upload` | `PROJECT-KNOWLEDGE-SERVICE` | Upload architecture blueprint document |
 
 ---
 
-## 📄 License & Contact
+## 📄 License & Organization
 
-This project is built for enterprise application learning, interview preparation, and technical stack mastery.
+**Winfo360 Enterprise ERP & Microservices Suite** is built for high-performance enterprise operations, architectural inspection, and cloud-native microservices engineering.
