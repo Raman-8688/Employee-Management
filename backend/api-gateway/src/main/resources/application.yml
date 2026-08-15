@@ -41,6 +41,12 @@ spring:
           predicates:
             - Path=/api/tasks/**
 
+        - id: project-knowledge-service
+          uri: lb://PROJECT-KNOWLEDGE-SERVICE
+          predicates:
+            - Path=/api/projects/**, /project-docs/**
+
+
 eureka:
   instance:
     prefer-ip-address: true

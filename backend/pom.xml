@@ -18,5 +18,7 @@
         <module>auth-service</module>
         <module>employee-service</module>
         <module>task-service</module>
+        <module>project-knowledge-service</module>
     </modules>
+
 </project>
