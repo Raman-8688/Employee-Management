@@ -1,16 +1,20 @@
-# 🏢 Winfo360 Enterprise ERP & Microservices Platform
+# 🌐 Nexus 360 Enterprise Platform
 
-An MNC-grade, resilient, multi-module **Enterprise Cloud Platform** built with **Spring Boot 3.3**, **Spring Cloud (Eureka & API Gateway)**, **PostgreSQL**, **Nvidia AI (GenAI LLMs)**, and **Angular 19** featuring an Amazon-style sliding multi-level navigation interface.
-
----
-
-## 🌟 Executive Summary & Enterprise Value Proposition
-
-**Winfo360 Enterprise Platform** replaces fragmented corporate tools by unifying **Workforce Operations**, **Jira-Style Sprint & Time Tracking**, **Nvidia GenAI Copilot Intelligence**, and an **Enterprise Application & Project Knowledge Hub** across organizational domain vertical suites (such as Asset Management System - AMS, Pharma Clinical Research, and Construction ERP).
+> **Formerly Winfo / Employee System** — Upgraded into an Industrial-Grade, Resilient, Cloud-Native **Nexus Enterprise Hub** connecting Enterprise Applications (AMS, Pharma, Construction), Database Schemas, REST APIs, Jira Sprint Velocity, and Nvidia GenAI Copilot Intelligence.
 
 ---
 
-## 🏗️ Microservices Ecosystem Topology
+## 🌟 Executive Summary & High-Tech Vision
+
+**Nexus 360 Enterprise Platform** serves as the central neural nexus for modern tech and engineering organizations. It bridges corporate silos by connecting:
+1. **Application & Knowledge Governance:** Central lookup for tech stacks, database schemas, stored procedures, screen components, and API endpoints across vertical domains (AMS - Asset Management System, Pharma Clinical Suite, Construction ERP).
+2. **Jira-Style Sprint & Time Velocity:** Kanban board with automated time calculation upon task completion and task learnings knowledge base.
+3. **Nvidia GenAI Copilot Intelligence:** Multi-model resilient LLM assistant with voice input/output and document analysis.
+4. **Workforce Operations:** Directory, attendance clock, audit ledger, and payroll engine.
+
+---
+
+## 🏗️ Microservices Architecture & Ecosystem Topology
 
 ```
                                   +-----------------------+
@@ -43,11 +47,24 @@ An MNC-grade, resilient, multi-module **Enterprise Cloud Platform** built with *
 
 ---
 
-## 💎 Core Pillars & Key Features
+## 🗄️ Microservices Database Isolation Matrix
 
-### 🏢 1. Enterprise Application & Project Knowledge Hub (`project-knowledge-service`)
+Every microservice operates on its dedicated relational database to guarantee domain boundary compliance:
+
+| Microservice | Port | Service ID | Dedicated Database | Scope & Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| `auth-service` | `8081` | `AUTH-SERVICE` | `auth_db` | User authentication, security roles (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_EMPLOYEE`), JWT issuance |
+| `employee-service` | `8082` | `EMPLOYEE-SERVICE` | `emp_db` | Employee directory, payroll records, attendance logs, Nvidia AI copilot engine |
+| `task-service` | `8083` | `TASK-SERVICE` | `task_db` | Jira tasks, subtask checklists, time tracking, velocity metrics, learnings attachments |
+| **`project-knowledge-service`** | **`8084`** | **`PROJECT-KNOWLEDGE-SERVICE`** | **`project_knowledge_db`** | **Nexus project catalog, tech stacks, database schemas, stored procedures, screens, APIs & docs** |
+
+---
+
+## 💎 Core Pillars & Enterprise Modules
+
+### 🏢 1. Nexus Enterprise Application & Project Knowledge Hub (`project-knowledge-service`)
 - **Port:** `8084` | **Dedicated Database:** `project_knowledge_db`
-- **Domain Project Catalog:** Comprehensive tracking of enterprise projects across **AMS (Asset Management)**, **Pharma Clinical Research**, **Construction ERP**, and **General Enterprise**.
+- **Domain Project Catalog:** Central tracking for enterprise applications across **AMS (Asset Management System)**, **Pharma Clinical Suite**, **Construction ERP**, and **General Enterprise**.
 - **Project 360° Inspector:** Deep architectural inspection with 5 dedicated tabs:
   1. *Tech Stack & Architecture:* Frontend, Backend, Database, DevOps, and AI component registry.
   2. *Database & Schemas Inventory:* Tables, column summaries, and stored procedures used (e.g. `sp_calculate_depreciation`, `sp_fda_safety_audit`).
@@ -83,20 +100,7 @@ An MNC-grade, resilient, multi-module **Enterprise Cloud Platform** built with *
 
 ---
 
-## 🗄️ Microservices Database Isolation Matrix
-
-Every microservice maintains strict database isolation for enterprise compliance:
-
-| Microservice | Port | Service ID | Dedicated Database | Scope & Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| `auth-service` | `8081` | `AUTH-SERVICE` | `auth_db` | User credentials, security roles (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_EMPLOYEE`), JWT tokens |
-| `employee-service` | `8082` | `EMPLOYEE-SERVICE` | `emp_db` | Employee profiles, payroll records, attendance logs, Nvidia AI copilot engine |
-| `task-service` | `8083` | `TASK-SERVICE` | `task_db` | Tasks, subtask checklists, time logs, sprint velocity metrics, learnings attachments |
-| **`project-knowledge-service`** | **`8084`** | **`PROJECT-KNOWLEDGE-SERVICE`** | **`project_knowledge_db`** | **Enterprise project catalog, tech stacks, table schemas, stored procedures, screens, APIs & docs** |
-
----
-
-## 🛠️ Technology Stack & Rationale
+## 🛠️ Technology Stack & Architectural Rationale
 
 | Layer | Technology | Rationale |
 | :--- | :--- | :--- |
@@ -112,10 +116,10 @@ Every microservice maintains strict database isolation for enterprise compliance
 
 ---
 
-## 📁 Project Directory Structure
+## 📁 Repository Directory Structure
 
 ```
-Winfo360-Enterprise-Platform/
+Nexus-360-Enterprise-Platform/
 ├── backend/
 │   ├── pom.xml                                 # Root Maven Multi-Module POM
 │   ├── common-library/                         # Shared DTOs (ApiResponse, UserPrincipal)
@@ -204,7 +208,7 @@ cd frontend
 npm install
 npm start
 ```
-*Access Winfo360 Enterprise Platform at `http://localhost:4200`.*
+*Access Nexus 360 Enterprise Platform at `http://localhost:4200`.*
 
 ---
 
@@ -235,4 +239,4 @@ The platform auto-seeds initial administrator access on startup:
 
 ## 📄 License & Organization
 
-**Winfo360 Enterprise ERP & Microservices Suite** is built for high-performance enterprise operations, architectural inspection, and cloud-native microservices engineering.
+**Nexus 360 Enterprise Platform** is built for high-performance enterprise operations, architectural inspection, and cloud-native microservices engineering.
