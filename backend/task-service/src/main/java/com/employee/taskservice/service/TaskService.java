@@ -3,12 +3,17 @@ package com.employee.taskservice.service;
 import com.employee.common.dto.ApiResponse;
 import com.employee.common.dto.EmployeeDto;
 import com.employee.taskservice.client.EmployeeClient;
+import com.employee.taskservice.entity.SubTask;
+import com.employee.taskservice.entity.TaskComment;
 import com.employee.taskservice.entity.TaskItem;
+import com.employee.taskservice.repository.SubTaskRepository;
+import com.employee.taskservice.repository.TaskCommentRepository;
 import com.employee.taskservice.repository.TaskRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +24,8 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final SubTaskRepository subTaskRepository;
+    private final TaskCommentRepository commentRepository;
     private final EmployeeClient employeeClient;
 
     @PostConstruct
@@ -26,7 +33,7 @@ public class TaskService {
         if (taskRepository.count() == 0) {
             log.info("Seeding initial Jira-level tasks into task_db...");
 
-            taskRepository.save(TaskItem.builder()
+            TaskItem task1 = taskRepository.save(TaskItem.builder()
                     .title("Configure Spring Cloud Gateway Dynamic Ingress")
                     .description("Set up microservices routing, dynamic Eureka discovery, rate limiting, and global CORS headers.")
                     .taskType("STORY")
@@ -36,10 +43,18 @@ public class TaskService {
                     .assigneeName("Raman")
                     .department("IT")
                     .reporterName("System Admin")
+                    .estimatedHours(12.0)
+                    .loggedHours(10.5)
+                    .tags("Gateway,Security,SpringCloud")
                     .createdAt(LocalDateTime.now().minusDays(3))
                     .build());
 
-            taskRepository.save(TaskItem.builder()
+            subTaskRepository.save(SubTask.builder().title("Configure route predicates").completed(true).task(task1).build());
+            subTaskRepository.save(SubTask.builder().title("Verify header deduplication").completed(true).task(task1).build());
+
+            commentRepository.save(TaskComment.builder().authorName("Raman").content("Ingress routing verified across all endpoints.").task(task1).build());
+
+            TaskItem task2 = taskRepository.save(TaskItem.builder()
                     .title("Refactor Angular Microservices Core Architecture")
                     .description("Migrate components into core, shared, and feature modular enterprise folder structures.")
                     .taskType("TASK")
@@ -49,10 +64,16 @@ public class TaskService {
                     .assigneeName("Ramesh")
                     .department("IT")
                     .reporterName("System Admin")
+                    .estimatedHours(16.0)
+                    .loggedHours(6.0)
+                    .tags("Angular,Frontend,Architecture")
                     .createdAt(LocalDateTime.now().minusDays(2))
                     .build());
 
-            taskRepository.save(TaskItem.builder()
+            subTaskRepository.save(SubTask.builder().title("Create standalone feature modules").completed(true).task(task2).build());
+            subTaskRepository.save(SubTask.builder().title("Implement Amazon sliding sidebar").completed(false).task(task2).build());
+
+            TaskItem task3 = taskRepository.save(TaskItem.builder()
                     .title("Integrate Nvidia Llama 3.1 8B AI Engine")
                     .description("Implement REST proxy controller to stream Nvidia AI prompts for performance evaluation.")
                     .taskType("STORY")
@@ -62,10 +83,13 @@ public class TaskService {
                     .assigneeName("Shyam Sundar")
                     .department("IT")
                     .reporterName("Tech Lead")
+                    .estimatedHours(20.0)
+                    .loggedHours(18.0)
+                    .tags("AI,Nvidia,LLM")
                     .createdAt(LocalDateTime.now().minusDays(1))
                     .build());
 
-            taskRepository.save(TaskItem.builder()
+            TaskItem task4 = taskRepository.save(TaskItem.builder()
                     .title("Fix CORS Preflight Headers on Auth Controller")
                     .description("Remove duplicate Access-Control-Allow-Origin annotations and centralize header deduplication.")
                     .taskType("BUG")
@@ -75,10 +99,13 @@ public class TaskService {
                     .assigneeName("Raman")
                     .department("IT")
                     .reporterName("QA Engineer")
+                    .estimatedHours(4.0)
+                    .loggedHours(3.5)
+                    .tags("BugFix,CORS,Auth")
                     .createdAt(LocalDateTime.now().minusDays(1))
                     .build());
 
-            taskRepository.save(TaskItem.builder()
+            TaskItem task5 = taskRepository.save(TaskItem.builder()
                     .title("Audit Payroll Tax Deduction Calculations")
                     .description("Verify itemized tax deduction formulas and automated text payslip generator.")
                     .taskType("TASK")
@@ -88,6 +115,9 @@ public class TaskService {
                     .assigneeName("Vikash")
                     .department("Operations")
                     .reporterName("HR Manager")
+                    .estimatedHours(8.0)
+                    .loggedHours(0.0)
+                    .tags("Payroll,Audit")
                     .createdAt(LocalDateTime.now())
                     .build());
         }
@@ -95,6 +125,16 @@ public class TaskService {
 
     public List<TaskItem> getAllTasks() {
         return taskRepository.findAll();
+    }
+
+    public List<TaskItem> filterTasks(String status, String taskType, String priority, Long assigneeId, String department) {
+        return taskRepository.filterTasks(
+                (status != null && !status.isEmpty()) ? status : null,
+                (taskType != null && !taskType.isEmpty()) ? taskType : null,
+                (priority != null && !priority.isEmpty()) ? priority : null,
+                assigneeId,
+                (department != null && !department.isEmpty()) ? department : null
+        );
     }
 
     public TaskItem getTaskById(Long id) {
@@ -129,6 +169,12 @@ public class TaskService {
         existing.setAssigneeId(updatedTask.getAssigneeId());
         existing.setAssigneeName(updatedTask.getAssigneeName());
         existing.setDepartment(updatedTask.getDepartment());
+        if (updatedTask.getEstimatedHours() != null) {
+            existing.setEstimatedHours(updatedTask.getEstimatedHours());
+        }
+        if (updatedTask.getTags() != null) {
+            existing.setTags(updatedTask.getTags());
+        }
         return taskRepository.save(existing);
     }
 
@@ -141,4 +187,55 @@ public class TaskService {
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
+
+    // SubTask Operations
+    @Transactional
+    public SubTask addSubTask(Long taskId, String title) {
+        TaskItem task = getTaskById(taskId);
+        SubTask subTask = SubTask.builder()
+                .title(title)
+                .completed(false)
+                .task(task)
+                .build();
+        return subTaskRepository.save(subTask);
+    }
+
+    @Transactional
+    public SubTask toggleSubTask(Long subTaskId) {
+        SubTask subTask = subTaskRepository.findById(subTaskId)
+                .orElseThrow(() -> new IllegalArgumentException("SubTask not found with id: " + subTaskId));
+        subTask.setCompleted(!subTask.isCompleted());
+        return subTaskRepository.save(subTask);
+    }
+
+    @Transactional
+    public void deleteSubTask(Long subTaskId) {
+        subTaskRepository.deleteById(subTaskId);
+    }
+
+    // Comment Operations
+    @Transactional
+    public TaskComment addComment(Long taskId, String authorName, String content) {
+        TaskItem task = getTaskById(taskId);
+        TaskComment comment = TaskComment.builder()
+                .authorName(authorName != null && !authorName.isEmpty() ? authorName : "System User")
+                .content(content)
+                .createdAt(LocalDateTime.now())
+                .task(task)
+                .build();
+        return commentRepository.save(comment);
+    }
+
+    public List<TaskComment> getComments(Long taskId) {
+        return commentRepository.findByTaskIdOrderByCreatedAtAsc(taskId);
+    }
+
+    public boolean canUserModifyTask(Long taskId, Long userId, String userRole) {
+        if (userRole != null && (userRole.equals("ROLE_ADMIN") || userRole.equals("ROLE_MANAGER") || userRole.equals("ROLE_HR"))) {
+            return true;
+        }
+        TaskItem task = getTaskById(taskId);
+        return task.getAssigneeId() != null && task.getAssigneeId().equals(userId);
+    }
 }
+
