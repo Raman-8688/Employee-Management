@@ -17,8 +17,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class AiCopilotController {
+
 
     private final NvidiaAiService nvidiaAiService;
 

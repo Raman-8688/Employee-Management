@@ -11,6 +11,7 @@ spring:
           enabled: true
           lower-case-service-id: false
       globalcors:
+
         cors-configurations:
           '[/**]':
             allowedOrigins: "http://localhost:4200"
@@ -23,6 +24,7 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: true
+
       routes:
         - id: auth-service
           uri: lb://AUTH-SERVICE

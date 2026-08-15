@@ -25,8 +25,8 @@ import java.util.UUID;
 @RequestMapping("/employee")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:4200")
 public class EmployeeController {
+
 
     private final EmployeeService employeeService;
     private static final String UPLOAD_DIR = "uploads/profile-images/";
@@ -50,13 +50,12 @@ public class EmployeeController {
     }
 
     @PostMapping("/save")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
         return ResponseEntity.ok(employeeService.saveEmployee(employee));
     }
 
     @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<Map<String, String>>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
         try {
             File uploadFolder = new File(UPLOAD_DIR);
@@ -77,6 +76,7 @@ public class EmployeeController {
             String imageUrl = "http://localhost:8080/uploads/profile-images/" + newFilename;
             Map<String, String> response = new HashMap<>();
             response.put("imageUrl", imageUrl);
+            response.put("url", imageUrl);
 
             return ResponseEntity.ok(new ApiResponse<>("Image uploaded successfully", response));
         } catch (IOException e) {
@@ -85,8 +85,9 @@ public class EmployeeController {
         }
     }
 
+
     @PatchMapping("/update")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<Employee> updateEmployeePatch(@RequestBody Employee employee) {
         if (employee.getId() == null) {
             throw new IllegalArgumentException("Employee ID is required for update");
@@ -95,10 +96,11 @@ public class EmployeeController {
     }
 
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
         return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
     }
+
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
