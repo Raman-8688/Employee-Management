@@ -23,19 +23,22 @@ public class TaskItem {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String description;
+
+    private String taskType; // STORY, BUG, TASK, EPIC
+    private String priority; // CRITICAL, HIGH, MEDIUM, LOW
+    private String status;   // TODO, IN_PROGRESS, IN_REVIEW, DONE
 
     private Long assigneeId;
     private String assigneeName;
     private String assigneeAvatar;
     private String department;
-
-    private String priority; // HIGH, MEDIUM, LOW
-    private String status;   // TODO, IN_PROGRESS, DONE
+    private String reporterName;
 
     private LocalDateTime dueDate;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
@@ -48,5 +51,13 @@ public class TaskItem {
         if (priority == null) {
             priority = "MEDIUM";
         }
+        if (taskType == null) {
+            taskType = "TASK";
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

@@ -1,1 +1,13 @@
-﻿backend/uploads/
+target/
+*.class
+.mvn/
+.idea/
+*.iml
+backend/uploads/
+uploads/
+application-secret.yml
+application-local.yml
+application-secret.properties
+.env
+*.key
+

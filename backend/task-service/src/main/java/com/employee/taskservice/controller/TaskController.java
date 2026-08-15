@@ -31,6 +31,11 @@ public class TaskController {
         return ResponseEntity.ok(new ApiResponse<>("Task created successfully", taskService.createTask(task)));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<TaskItem>> updateTask(@PathVariable("id") Long id, @RequestBody TaskItem task) {
+        return ResponseEntity.ok(new ApiResponse<>("Task updated successfully", taskService.updateTask(id, task)));
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<TaskItem>> updateTaskStatus(@PathVariable("id") Long id, @RequestParam("status") String status) {
         return ResponseEntity.ok(new ApiResponse<>("Task status updated successfully", taskService.updateTaskStatus(id, status)));

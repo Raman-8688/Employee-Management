@@ -26,14 +26,14 @@ public class EmployeeController {
     private final FileStorageService fileStorageService;
 
     @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
         String imageUrl = fileStorageService.storeFile(file);
         return ResponseEntity.ok(new ApiResponse<>("Image uploaded successfully", imageUrl));
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<ApiResponse<Employee>> getEmployeeDetails(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeDetail(id)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));

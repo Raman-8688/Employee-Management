@@ -19,9 +19,9 @@ spring:
 
 nvidia:
   ai:
-    api-key: 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
-    url: https://integrate.api.nvidia.com/v1/chat/completions
-    default-model: meta/llama-3.1-8b-instruct
+    api-key: ${NVIDIA_AI_API_KEY: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}
+    url: ${NVIDIA_AI_URL:https://integrate.api.nvidia.com/v1/chat/completions}
+    default-model: ${NVIDIA_AI_DEFAULT_MODEL:meta/llama-3.1-8b-instruct}
 
 eureka:
   instance:
