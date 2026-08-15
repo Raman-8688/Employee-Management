@@ -37,6 +37,7 @@ public class TaskLearningService {
                     .title("Header Deduplication Filter Syntax in Gateway 4.1+")
                     .category("ARCHITECTURE")
                     .content("When configuring CORS in Spring Cloud Gateway alongside controller CORS annotations, duplicate headers trigger ERR_FAILED. Centralizing CORS in Gateway globalcors and removing controller @CrossOrigin prevents duplicate Access-Control-Allow-Origin headers.")
+                    .fileType("PDF")
                     .createdAt(LocalDateTime.now().minusDays(2))
                     .build());
 
@@ -48,6 +49,7 @@ public class TaskLearningService {
                     .title("Handling OPTIONS Preflight Requests in Spring Security")
                     .category("SECURITY")
                     .content("Always configure requestMatchers(HttpMethod.OPTIONS, \"/**\").permitAll() in SecurityFilterChain. This ensures preflight OPTIONS requests pass without 403 Forbidden before Authorization headers are validated.")
+                    .fileType("DOCX")
                     .createdAt(LocalDateTime.now().minusDays(1))
                     .build());
 
@@ -59,12 +61,13 @@ public class TaskLearningService {
                     .title("Multi-Model Resilient Fallback Strategy for LLM APIs")
                     .category("TECHNICAL")
                     .content("External LLM APIs can hit rate limits or 429 quota exhaustion. Implement fallback model lists (meta/llama-3.1-70b-instruct, mistralai/mistral-7b-instruct-v0.2) and local MNC HR fallback text generators to ensure 100% uptime for end users.")
+                    .fileType("PNG")
                     .createdAt(LocalDateTime.now().minusHours(12))
                     .build());
         }
     }
 
-    public TaskLearning createLearning(Long taskId, Long employeeId, String authorName, String title, String category, String content) {
+    public TaskLearning createLearning(Long taskId, Long employeeId, String authorName, String title, String category, String content, String attachmentUrl, String fileType) {
         String empName = authorName;
         String taskTitle = "General Lesson";
 
@@ -94,6 +97,8 @@ public class TaskLearningService {
                 .title(title)
                 .category(category != null ? category.toUpperCase() : "TECHNICAL")
                 .content(content)
+                .attachmentUrl(attachmentUrl)
+                .fileType(fileType)
                 .createdAt(LocalDateTime.now())
                 .build();
 

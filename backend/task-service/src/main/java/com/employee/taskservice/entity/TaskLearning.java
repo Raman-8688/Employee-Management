@@ -32,6 +32,9 @@ public class TaskLearning {
     @Column(length = 4000, nullable = false)
     private String content;
 
+    private String attachmentUrl;
+    private String fileType;
+
     private LocalDateTime createdAt;
 
     @PrePersist

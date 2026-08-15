@@ -6,15 +6,18 @@ import com.employee.taskservice.client.EmployeeClient;
 import com.employee.taskservice.entity.SubTask;
 import com.employee.taskservice.entity.TaskComment;
 import com.employee.taskservice.entity.TaskItem;
+import com.employee.taskservice.entity.TaskTimeLog;
 import com.employee.taskservice.repository.SubTaskRepository;
 import com.employee.taskservice.repository.TaskCommentRepository;
 import com.employee.taskservice.repository.TaskRepository;
+import com.employee.taskservice.repository.TaskTimeLogRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final SubTaskRepository subTaskRepository;
     private final TaskCommentRepository commentRepository;
+    private final TaskTimeLogRepository timeLogRepository;
     private final EmployeeClient employeeClient;
 
     @PostConstruct
@@ -159,13 +163,17 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    @Transactional
     public TaskItem updateTask(Long id, TaskItem updatedTask) {
         TaskItem existing = getTaskById(id);
+        String oldStatus = existing.getStatus();
+        String newStatus = updatedTask.getStatus();
+
         existing.setTitle(updatedTask.getTitle());
         existing.setDescription(updatedTask.getDescription());
         existing.setPriority(updatedTask.getPriority());
         existing.setTaskType(updatedTask.getTaskType());
-        existing.setStatus(updatedTask.getStatus());
+        existing.setStatus(newStatus);
         existing.setAssigneeId(updatedTask.getAssigneeId());
         existing.setAssigneeName(updatedTask.getAssigneeName());
         existing.setDepartment(updatedTask.getDepartment());
@@ -175,13 +183,47 @@ public class TaskService {
         if (updatedTask.getTags() != null) {
             existing.setTags(updatedTask.getTags());
         }
+
+        // Automated Task Duration Calculation when moved to DONE
+        checkAndApplyAutoTimeLog(existing, oldStatus, newStatus);
+
         return taskRepository.save(existing);
     }
 
+    @Transactional
     public TaskItem updateTaskStatus(Long id, String status) {
         TaskItem task = getTaskById(id);
+        String oldStatus = task.getStatus();
         task.setStatus(status);
+
+        // Automated Task Duration Calculation when moved to DONE
+        checkAndApplyAutoTimeLog(task, oldStatus, status);
+
         return taskRepository.save(task);
+    }
+
+    private void checkAndApplyAutoTimeLog(TaskItem task, String oldStatus, String newStatus) {
+        if ("DONE".equalsIgnoreCase(newStatus) && !"DONE".equalsIgnoreCase(oldStatus)) {
+            Double currentLogged = task.getLoggedHours();
+            if (currentLogged == null || currentLogged == 0.0) {
+                LocalDateTime start = task.getCreatedAt() != null ? task.getCreatedAt() : LocalDateTime.now().minusHours(2);
+                long minutes = Math.max(30, Duration.between(start, LocalDateTime.now()).toMinutes());
+                double autoHours = Math.round((minutes / 60.0) * 10.0) / 10.0;
+
+                TaskTimeLog autoLog = TaskTimeLog.builder()
+                        .task(task)
+                        .employeeId(task.getAssigneeId() != null ? task.getAssigneeId() : 1L)
+                        .employeeName(task.getAssigneeName() != null ? task.getAssigneeName() : "Assigned Engineer")
+                        .hoursSpent(autoHours)
+                        .logDate(LocalDateTime.now())
+                        .description("Automated Task Duration Calculation on Completion (" + autoHours + " hrs elapsed)")
+                        .build();
+
+                timeLogRepository.save(autoLog);
+                task.setLoggedHours(autoHours);
+                log.info("Automated time tracking calculated {} hrs for completed task #{}", autoHours, task.getId());
+            }
+        }
     }
 
     public void deleteTask(Long id) {
@@ -238,4 +280,3 @@ public class TaskService {
         return task.getAssigneeId() != null && task.getAssigneeId().equals(userId);
     }
 }
-
