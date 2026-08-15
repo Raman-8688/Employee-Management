@@ -1,5 +1,7 @@
+import { environment } from '../../../../environments/environment';
+
 export const APP_CONSTANTS = {
-  API_BASE_URL: 'http://localhost:8080',
+  API_BASE_URL: environment.apiUrl,
   DEFAULT_DIALOG: {
     CONFIRM_TEXT: 'Confirm',
     CANCEL_TEXT: 'Cancel',

@@ -58,8 +58,14 @@ export class RegisterComponent {
     this.errorMessage = '';
 
     if (this.registerForm.invalid) {
+      if (this.registerForm.errors?.['mismatch']) {
+        this.errorMessage = 'Passwords do not match. Please verify.';
+      } else {
+        this.errorMessage = 'Please fill in all required fields correctly.';
+      }
       return;
     }
+
 
     this.isLoading = true;
     const { confirmPassword, ...registerData } = this.registerForm.value;

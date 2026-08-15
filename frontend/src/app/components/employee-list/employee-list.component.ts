@@ -311,8 +311,16 @@ export class EmployeeListComponent implements OnInit {
       this.isUploadingPhoto = true;
       this.employeeService.uploadImage(file).subscribe({
         next: (response: any) => {
-          const imageUrl = response.imageUrl;
-          if (this.photoPreviewEmployee) {
+          let imageUrl = '';
+          if (typeof response === 'string') {
+            imageUrl = response;
+          } else if (response) {
+            imageUrl = response.imageUrl || response.url ||
+                       (typeof response.data === 'string' ? response.data :
+                       (response.data?.imageUrl || response.data?.url || ''));
+          }
+
+          if (imageUrl && this.photoPreviewEmployee) {
             this.photoPreviewEmployee.profileImageUrl = imageUrl;
             // Persist update in DB
             this.employeeService.updateEmployee(this.photoPreviewEmployee).subscribe({
@@ -325,6 +333,8 @@ export class EmployeeListComponent implements OnInit {
                 this.isUploadingPhoto = false;
               }
             });
+          } else {
+            this.isUploadingPhoto = false;
           }
         },
         error: (err) => {

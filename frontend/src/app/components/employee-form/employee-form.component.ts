@@ -69,9 +69,18 @@ export class EmployeeFormComponent implements OnInit {
     if (this.selectedFile) {
       // Upload image first
       this.employeeService.uploadImage(this.selectedFile).subscribe({
-        next: (res) => {
-          const uploadedUrl = res.data || res;
-          this.formData.profileImageUrl = uploadedUrl;
+        next: (res: any) => {
+          let uploadedUrl = '';
+          if (typeof res === 'string') {
+            uploadedUrl = res;
+          } else if (res) {
+            uploadedUrl = res.imageUrl || res.url ||
+                          (typeof res.data === 'string' ? res.data :
+                          (res.data?.imageUrl || res.data?.url || ''));
+          }
+          if (uploadedUrl) {
+            this.formData.profileImageUrl = uploadedUrl;
+          }
           this.submitEmployeeData();
         },
         error: (err) => {

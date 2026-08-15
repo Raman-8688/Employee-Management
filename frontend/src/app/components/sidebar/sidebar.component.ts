@@ -44,8 +44,11 @@ export class SidebarComponent implements OnInit {
 
   getUserInitials(): string {
     if (this.user) {
-      return `${this.user.firstName?.charAt(0)}${this.user.lastName?.charAt(0)}`;
+      const first = this.user.firstName ? this.user.firstName.charAt(0) : '';
+      const last = this.user.lastName ? this.user.lastName.charAt(0) : '';
+      if (first || last) return `${first}${last}`.toUpperCase();
+      if (this.user.username) return this.user.username.charAt(0).toUpperCase();
     }
-    return 'U';
+    return 'A';
   }
 }

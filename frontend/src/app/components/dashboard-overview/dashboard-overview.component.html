@@ -151,34 +151,49 @@
         <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
           <h5 class="fw-bold mb-3 text-dark">Quick Actions</h5>
           <div class="row g-2">
-            <div class="col-6">
+            <div class="col-4">
+              <a routerLink="/dashboard/tasks" class="btn btn-outline-warning w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
+                <mat-icon class="fs-4 text-warning">task_alt</mat-icon>
+                <span class="fw-semibold text-dark small">Task Board</span>
+                <small class="text-muted" style="font-size: 11px;">Jira Kanban board</small>
+              </a>
+            </div>
+            <div class="col-4">
+              <a routerLink="/dashboard/time-tools" class="btn btn-outline-secondary w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
+                <mat-icon class="fs-4 text-secondary">schedule</mat-icon>
+                <span class="fw-semibold text-dark small">Time & Clocking</span>
+                <small class="text-muted" style="font-size: 11px;">Clock in / clock out</small>
+              </a>
+            </div>
+            <div class="col-4">
+              <a routerLink="/dashboard/ai-copilot" class="btn btn-outline-purple w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none border-purple">
+                <mat-icon class="fs-4 text-purple">auto_awesome</mat-icon>
+                <span class="fw-semibold text-dark small">AI Copilot</span>
+                <small class="text-muted" style="font-size: 11px;">GenAI Assistant</small>
+              </a>
+            </div>
+            <div class="col-4">
               <a routerLink="/dashboard/people" class="btn btn-outline-primary w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
                 <mat-icon class="fs-4 text-primary">person_add</mat-icon>
                 <span class="fw-semibold text-dark small">Add Employee</span>
                 <small class="text-muted" style="font-size: 11px;">Create new record</small>
               </a>
             </div>
-            <div class="col-6">
-              <a routerLink="/dashboard/ai-copilot" class="btn btn-outline-purple w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none border-purple">
-                <mat-icon class="fs-4 text-purple">auto_awesome</mat-icon>
-                <span class="fw-semibold text-dark small">AI Copilot</span>
-                <small class="text-muted" style="font-size: 11px;">GenAI Appraisal</small>
-              </a>
-            </div>
-            <div class="col-6">
+            <div class="col-4">
               <a routerLink="/dashboard/payroll" class="btn btn-outline-success w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
                 <mat-icon class="fs-4 text-success">payments</mat-icon>
                 <span class="fw-semibold text-dark small">Process Payroll</span>
                 <small class="text-muted" style="font-size: 11px;">Salary distribution</small>
               </a>
             </div>
-            <div class="col-6">
+            <div class="col-4">
               <a routerLink="/dashboard/document" class="btn btn-outline-info w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
                 <mat-icon class="fs-4 text-info">description</mat-icon>
                 <span class="fw-semibold text-dark small">HR Documents</span>
                 <small class="text-muted" style="font-size: 11px;">Policies & letters</small>
               </a>
             </div>
+
           </div>
         </div>
 

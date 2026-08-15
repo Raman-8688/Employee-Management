@@ -24,13 +24,15 @@ export class RoleGuard implements CanActivate {
       return false;
     }
 
-    const user = this.authService.currentUserValue;
-    const hasRole = user ? requiredRoles.includes(user.role) : false;
+    const hasRole = this.authService.hasAnyRole(requiredRoles);
 
     if (!hasRole) {
+      const user = this.authService.currentUserValue;
       console.log(
         'Role access denied. User role:',
         user?.role,
+        'Roles:',
+        user?.roles,
         'Required roles:',
         requiredRoles,
       );

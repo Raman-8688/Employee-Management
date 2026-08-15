@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface AiChatRequest {
   message: string;
@@ -25,7 +26,7 @@ interface ApiResponse<T> {
   providedIn: 'root',
 })
 export class AiService {
-  private baseUrl = 'http://localhost:8080/api/ai';
+  private baseUrl = `${environment.apiUrl}/api/ai`;
 
   constructor(private http: HttpClient) {}
 

@@ -1,285 +1,390 @@
-<div class="container-fluid p-4 task-board-container">
-  <!-- Top Header Bar -->
-  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-    <div>
-      <h3 class="fw-bold mb-1 text-dark">Task & Project Kanban Board</h3>
-      <p class="text-secondary mb-0 small">Enterprise task assignments, bug tracking, and stage transitions.</p>
+<div class="jira-board-wrapper">
+  <!-- Page Header -->
+  <div class="board-header">
+    <div class="header-titles">
+      <div class="badge-row">
+        <span class="project-tag"><mat-icon>dashboard</mat-icon> MNC Project Kanban</span>
+        <span class="role-badge"><mat-icon>security</mat-icon> {{ userRole }}</span>
+      </div>
+      <h2>Enterprise Jira Task & Bug Tracker</h2>
+      <p>Real-time microservice task progression, bug tracking, and role-based access control.</p>
     </div>
 
-    <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-1" (click)="loadTasks()">
-        <mat-icon class="fs-6">refresh</mat-icon> Refresh
+    <div class="header-actions">
+      <button class="btn-create-issue" (click)="openNewTaskModal()">
+        <mat-icon>add</mat-icon> Create Issue
       </button>
-      <button class="btn btn-primary btn-sm rounded-pill px-4 d-flex align-items-center gap-1 shadow-sm" (click)="openNewTaskModal()">
-        <mat-icon class="fs-6">add</mat-icon> New Task
-      </button>
     </div>
   </div>
 
-  <!-- Filter Toolbar -->
-  <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4">
-    <div class="row g-3 align-items-center">
-      <!-- Search Input -->
-      <div class="col-12 col-md-6">
-        <div class="input-group">
-          <span class="input-group-text bg-light border-0 ps-3">
-            <mat-icon class="text-secondary fs-5">search</mat-icon>
-          </span>
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery" 
-            placeholder="Search task title, description, or assignee..." 
-            class="form-control border-0 bg-light py-2 shadow-none" />
-        </div>
+  <!-- KPI Stat Metrics Summary Cards -->
+  <div class="kpi-metrics-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon total"><mat-icon>assignment</mat-icon></div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ totalTasksCount }}</span>
+        <span class="kpi-label">Total Backlog Issues</span>
       </div>
+    </div>
 
-      <!-- Priority Filter -->
-      <div class="col-6 col-md-3">
-        <select [(ngModel)]="filterPriority" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
-          <option value="">All Priorities</option>
-          <option value="HIGH">HIGH Priority</option>
-          <option value="MEDIUM">MEDIUM Priority</option>
-          <option value="LOW">LOW Priority</option>
-        </select>
+    <div class="kpi-card">
+      <div class="kpi-icon bug"><mat-icon>bug_report</mat-icon></div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ openBugsCount }}</span>
+        <span class="kpi-label">Open System Bugs</span>
       </div>
+    </div>
 
-      <!-- Department Filter -->
-      <div class="col-6 col-md-3">
-        <select [(ngModel)]="filterDepartment" class="form-select border-0 bg-light py-2 shadow-none text-secondary fw-medium">
-          <option value="">All Departments</option>
-          <option value="IT">IT</option>
-          <option value="Operations">Operations</option>
-          <option value="HR">HR</option>
-          <option value="Finance">Finance</option>
-        </select>
+    <div class="kpi-card">
+      <div class="kpi-icon done"><mat-icon>check_circle</mat-icon></div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ doneTasksCount }}</span>
+        <span class="kpi-label">Completed Tasks</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon critical"><mat-icon>priority_high</mat-icon></div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ highPriorityCount }}</span>
+        <span class="kpi-label">Critical / High Priority</span>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-2 text-secondary fw-medium">Loading Tasks & Bugs...</p>
+  <!-- Filter & Search Controls Bar -->
+  <div class="filter-controls-bar">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search tasks, bugs, assignees..." />
+    </div>
+
+    <div class="filter-dropdowns">
+      <select [(ngModel)]="filterType" class="filter-select">
+        <option value="">All Issue Types</option>
+        <option value="STORY">📘 Story</option>
+        <option value="BUG">🐛 Bug</option>
+        <option value="TASK">📌 Task</option>
+        <option value="EPIC">⚡ Epic</option>
+      </select>
+
+      <select [(ngModel)]="filterPriority" class="filter-select">
+        <option value="">All Priorities</option>
+        <option value="CRITICAL">🔴 Critical</option>
+        <option value="HIGH">🟠 High</option>
+        <option value="MEDIUM">🟡 Medium</option>
+        <option value="LOW">🔵 Low</option>
+      </select>
+
+      <select [(ngModel)]="filterDepartment" class="filter-select">
+        <option value="">All Departments</option>
+        <option value="IT">IT & Engineering</option>
+        <option value="HR">HR & Recruitment</option>
+        <option value="Finance">Finance</option>
+        <option value="Operations">Operations</option>
+      </select>
+    </div>
   </div>
 
-  <!-- 3-COLUMN KANBAN BOARD -->
-  <div *ngIf="!isLoading" class="row g-4">
-    <!-- COLUMN 1: TO DO -->
-    <div class="col-12 col-lg-4">
-      <div class="kanban-column p-3 rounded-4 bg-light-subtle border h-100">
-        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-secondary rounded-circle p-1"></span>
-            <h6 class="fw-bold mb-0 text-dark">To Do</h6>
-          </div>
-          <span class="badge bg-secondary-subtle text-secondary rounded-pill font-monospace">
-            {{ getTasksByStatus('TODO').length }}
-          </span>
+  <!-- Loading Spinner -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading Jira Task Board from Microservices...</p>
+  </div>
+
+  <!-- 4-Column Kanban Drag-and-Drop Board Grid -->
+  <div class="kanban-grid" *ngIf="!isLoading">
+
+    <!-- Column 1: TO DO -->
+    <div class="kanban-column"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event, 'TODO')">
+      <div class="column-header todo">
+        <div class="title-with-badge">
+          <mat-icon>radio_button_unchecked</mat-icon>
+          <h3>TO DO</h3>
         </div>
-
-        <div class="d-flex flex-column gap-3">
-          <div *ngFor="let task of getTasksByStatus('TODO')" class="card border-0 shadow-sm rounded-3 p-3 bg-white task-card">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span 
-                class="badge rounded-pill px-2 py-1 font-monospace"
-                [class.bg-danger-subtle]="task.priority === 'HIGH'"
-                [class.text-danger]="task.priority === 'HIGH'"
-                [class.bg-warning-subtle]="task.priority === 'MEDIUM'"
-                [class.text-warning]="task.priority === 'MEDIUM'"
-                [class.bg-info-subtle]="task.priority === 'LOW'"
-                [class.text-info]="task.priority === 'LOW'"
-                style="font-size: 10px;"
-              >
-                {{ task.priority }}
-              </span>
-              <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">
-                {{ task.department || 'General' }}
-              </span>
-            </div>
-
-            <h6 class="fw-bold text-dark mb-1 style-14">{{ task.title }}</h6>
-            <p class="text-secondary small mb-3 text-truncate-2" style="font-size: 12.5px;">{{ task.description }}</p>
-
-            <div class="d-flex align-items-center justify-content-between border-top pt-2 mt-auto">
-              <div class="d-flex align-items-center gap-2">
-                <div class="task-avatar">
-                  <img *ngIf="task.assigneeAvatar" [src]="task.assigneeAvatar" [alt]="task.assigneeName" />
-                  <span *ngIf="!task.assigneeAvatar">{{ task.assigneeName ? task.assigneeName.charAt(0).toUpperCase() : 'U' }}</span>
-                </div>
-                <small class="fw-semibold text-dark" style="font-size: 12px;">{{ task.assigneeName || 'Unassigned' }}</small>
-              </div>
-
-              <div class="d-flex align-items-center gap-1">
-                <button class="btn btn-sm btn-light text-primary rounded-circle p-1" (click)="moveTask(task, 'IN_PROGRESS')" title="Move to In Progress">
-                  <mat-icon class="fs-6">arrow_forward</mat-icon>
-                </button>
-                <button class="btn btn-sm btn-light text-danger rounded-circle p-1" (click)="deleteTask(task)" title="Delete">
-                  <mat-icon class="fs-6">delete</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <span class="count-badge">{{ getTasksByStatus('TODO').length }}</span>
       </div>
-    </div>
 
-    <!-- COLUMN 2: IN PROGRESS -->
-    <div class="col-12 col-lg-4">
-      <div class="kanban-column p-3 rounded-4 bg-light-subtle border h-100">
-        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-primary rounded-circle p-1"></span>
-            <h6 class="fw-bold mb-0 text-dark">In Progress</h6>
+      <div class="task-list">
+        <div class="task-card"
+             *ngFor="let task of getTasksByStatus('TODO')"
+             draggable="true"
+             (dragstart)="onDragStart($event, task)">
+
+          <div class="card-header">
+            <span class="type-badge" [class]="task.taskType || 'TASK'">
+              {{ task.taskType || 'TASK' }}
+            </span>
+            <span class="priority-badge" [class]="task.priority">
+              {{ task.priority }}
+            </span>
           </div>
-          <span class="badge bg-primary-subtle text-primary rounded-pill font-monospace">
-            {{ getTasksByStatus('IN_PROGRESS').length }}
-          </span>
-        </div>
 
-        <div class="d-flex flex-column gap-3">
-          <div *ngFor="let task of getTasksByStatus('IN_PROGRESS')" class="card border-0 shadow-sm rounded-3 p-3 bg-white task-card border-start border-primary border-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span 
-                class="badge rounded-pill px-2 py-1 font-monospace"
-                [class.bg-danger-subtle]="task.priority === 'HIGH'"
-                [class.text-danger]="task.priority === 'HIGH'"
-                [class.bg-warning-subtle]="task.priority === 'MEDIUM'"
-                [class.text-warning]="task.priority === 'MEDIUM'"
-                [class.bg-info-subtle]="task.priority === 'LOW'"
-                [class.text-info]="task.priority === 'LOW'"
-                style="font-size: 10px;"
-              >
-                {{ task.priority }}
-              </span>
-              <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">
-                {{ task.department || 'General' }}
-              </span>
+          <h4 class="task-title" (click)="openEditTaskModal(task)">{{ task.title }}</h4>
+          <p class="task-desc">{{ task.description }}</p>
+
+          <div class="card-footer">
+            <div class="assignee-info">
+              <div class="avatar-circle">
+                {{ (task.assigneeName ? task.assigneeName.charAt(0) : 'U') | uppercase }}
+              </div>
+              <span class="assignee-name">{{ task.assigneeName || 'Unassigned' }}</span>
             </div>
 
-            <h6 class="fw-bold text-dark mb-1 style-14">{{ task.title }}</h6>
-            <p class="text-secondary small mb-3 text-truncate-2" style="font-size: 12.5px;">{{ task.description }}</p>
-
-            <div class="d-flex align-items-center justify-content-between border-top pt-2 mt-auto">
-              <div class="d-flex align-items-center gap-2">
-                <div class="task-avatar">
-                  <img *ngIf="task.assigneeAvatar" [src]="task.assigneeAvatar" [alt]="task.assigneeName" />
-                  <span *ngIf="!task.assigneeAvatar">{{ task.assigneeName ? task.assigneeName.charAt(0).toUpperCase() : 'U' }}</span>
-                </div>
-                <small class="fw-semibold text-dark" style="font-size: 12px;">{{ task.assigneeName || 'Unassigned' }}</small>
-              </div>
-
-              <div class="d-flex align-items-center gap-1">
-                <button class="btn btn-sm btn-light text-secondary rounded-circle p-1" (click)="moveTask(task, 'TODO')" title="Move to To Do">
-                  <mat-icon class="fs-6">arrow_back</mat-icon>
-                </button>
-                <button class="btn btn-sm btn-light text-success rounded-circle p-1" (click)="moveTask(task, 'DONE')" title="Mark as Done">
-                  <mat-icon class="fs-6">check_circle</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- COLUMN 3: DONE -->
-    <div class="col-12 col-lg-4">
-      <div class="kanban-column p-3 rounded-4 bg-light-subtle border h-100">
-        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-success rounded-circle p-1"></span>
-            <h6 class="fw-bold mb-0 text-dark">Done</h6>
-          </div>
-          <span class="badge bg-success-subtle text-success rounded-pill font-monospace">
-            {{ getTasksByStatus('DONE').length }}
-          </span>
-        </div>
-
-        <div class="d-flex flex-column gap-3">
-          <div *ngFor="let task of getTasksByStatus('DONE')" class="card border-0 shadow-sm rounded-3 p-3 bg-white task-card opacity-75">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 font-monospace" style="font-size: 10px;">
-                COMPLETED
-              </span>
-              <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">
-                {{ task.department || 'General' }}
-              </span>
-            </div>
-
-            <h6 class="fw-bold text-dark mb-1 style-14 text-decoration-line-through">{{ task.title }}</h6>
-            <p class="text-secondary small mb-3 text-truncate-2" style="font-size: 12.5px;">{{ task.description }}</p>
-
-            <div class="d-flex align-items-center justify-content-between border-top pt-2 mt-auto">
-              <div class="d-flex align-items-center gap-2">
-                <div class="task-avatar">
-                  <img *ngIf="task.assigneeAvatar" [src]="task.assigneeAvatar" [alt]="task.assigneeName" />
-                  <span *ngIf="!task.assigneeAvatar">{{ task.assigneeName ? task.assigneeName.charAt(0).toUpperCase() : 'U' }}</span>
-                </div>
-                <small class="fw-semibold text-dark" style="font-size: 12px;">{{ task.assigneeName || 'Unassigned' }}</small>
-              </div>
-
-              <button class="btn btn-sm btn-light text-danger rounded-circle p-1" (click)="deleteTask(task)" title="Delete">
-                <mat-icon class="fs-6">delete</mat-icon>
+            <div class="card-actions">
+              <button class="btn-icon" (click)="moveTask(task, 'IN_PROGRESS')" title="Move to In Progress">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+              <button class="btn-icon danger" *ngIf="isAdminOrManager" (click)="deleteTask(task)" title="Delete Issue">
+                <mat-icon>delete_outline</mat-icon>
               </button>
             </div>
           </div>
         </div>
+
+        <div class="empty-drop-zone" *ngIf="getTasksByStatus('TODO').length === 0">
+          <mat-icon>inbox</mat-icon>
+          <p>No tasks in To Do</p>
+        </div>
       </div>
     </div>
+
+    <!-- Column 2: IN PROGRESS -->
+    <div class="kanban-column"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event, 'IN_PROGRESS')">
+      <div class="column-header in-progress">
+        <div class="title-with-badge">
+          <mat-icon>play_circle_outline</mat-icon>
+          <h3>IN PROGRESS</h3>
+        </div>
+        <span class="count-badge">{{ getTasksByStatus('IN_PROGRESS').length }}</span>
+      </div>
+
+      <div class="task-list">
+        <div class="task-card"
+             *ngFor="let task of getTasksByStatus('IN_PROGRESS')"
+             draggable="true"
+             (dragstart)="onDragStart($event, task)">
+
+          <div class="card-header">
+            <span class="type-badge" [class]="task.taskType || 'TASK'">
+              {{ task.taskType || 'TASK' }}
+            </span>
+            <span class="priority-badge" [class]="task.priority">
+              {{ task.priority }}
+            </span>
+          </div>
+
+          <h4 class="task-title" (click)="openEditTaskModal(task)">{{ task.title }}</h4>
+          <p class="task-desc">{{ task.description }}</p>
+
+          <div class="card-footer">
+            <div class="assignee-info">
+              <div class="avatar-circle">
+                {{ (task.assigneeName ? task.assigneeName.charAt(0) : 'U') | uppercase }}
+              </div>
+              <span class="assignee-name">{{ task.assigneeName || 'Unassigned' }}</span>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-icon" (click)="moveTask(task, 'IN_REVIEW')" title="Move to In Review">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+              <button class="btn-icon danger" *ngIf="isAdminOrManager" (click)="deleteTask(task)" title="Delete Issue">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-drop-zone" *ngIf="getTasksByStatus('IN_PROGRESS').length === 0">
+          <mat-icon>inbox</mat-icon>
+          <p>No active tasks</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 3: IN REVIEW -->
+    <div class="kanban-column"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event, 'IN_REVIEW')">
+      <div class="column-header in-review">
+        <div class="title-with-badge">
+          <mat-icon>rate_review</mat-icon>
+          <h3>IN REVIEW</h3>
+        </div>
+        <span class="count-badge">{{ getTasksByStatus('IN_REVIEW').length }}</span>
+      </div>
+
+      <div class="task-list">
+        <div class="task-card"
+             *ngFor="let task of getTasksByStatus('IN_REVIEW')"
+             draggable="true"
+             (dragstart)="onDragStart($event, task)">
+
+          <div class="card-header">
+            <span class="type-badge" [class]="task.taskType || 'TASK'">
+              {{ task.taskType || 'TASK' }}
+            </span>
+            <span class="priority-badge" [class]="task.priority">
+              {{ task.priority }}
+            </span>
+          </div>
+
+          <h4 class="task-title" (click)="openEditTaskModal(task)">{{ task.title }}</h4>
+          <p class="task-desc">{{ task.description }}</p>
+
+          <div class="card-footer">
+            <div class="assignee-info">
+              <div class="avatar-circle">
+                {{ (task.assigneeName ? task.assigneeName.charAt(0) : 'U') | uppercase }}
+              </div>
+              <span class="assignee-name">{{ task.assigneeName || 'Unassigned' }}</span>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-icon success" (click)="moveTask(task, 'DONE')" title="Approve & Complete">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button class="btn-icon danger" *ngIf="isAdminOrManager" (click)="deleteTask(task)" title="Delete Issue">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-drop-zone" *ngIf="getTasksByStatus('IN_REVIEW').length === 0">
+          <mat-icon>inbox</mat-icon>
+          <p>No tasks under review</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 4: DONE -->
+    <div class="kanban-column"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event, 'DONE')">
+      <div class="column-header done">
+        <div class="title-with-badge">
+          <mat-icon>task_alt</mat-icon>
+          <h3>DONE</h3>
+        </div>
+        <span class="count-badge">{{ getTasksByStatus('DONE').length }}</span>
+      </div>
+
+      <div class="task-list">
+        <div class="task-card completed"
+             *ngFor="let task of getTasksByStatus('DONE')"
+             draggable="true"
+             (dragstart)="onDragStart($event, task)">
+
+          <div class="card-header">
+            <span class="type-badge" [class]="task.taskType || 'TASK'">
+              {{ task.taskType || 'TASK' }}
+            </span>
+            <span class="priority-badge" [class]="task.priority">
+              {{ task.priority }}
+            </span>
+          </div>
+
+          <h4 class="task-title" (click)="openEditTaskModal(task)">{{ task.title }}</h4>
+          <p class="task-desc">{{ task.description }}</p>
+
+          <div class="card-footer">
+            <div class="assignee-info">
+              <div class="avatar-circle">
+                {{ (task.assigneeName ? task.assigneeName.charAt(0) : 'U') | uppercase }}
+              </div>
+              <span class="assignee-name">{{ task.assigneeName || 'Unassigned' }}</span>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-icon danger" *ngIf="isAdminOrManager" (click)="deleteTask(task)" title="Delete Issue">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-drop-zone" *ngIf="getTasksByStatus('DONE').length === 0">
+          <mat-icon>inbox</mat-icon>
+          <p>No completed tasks</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- NEW TASK MODAL FORM -->
-  <div *ngIf="showTaskModal" class="task-modal-overlay d-flex align-items-center justify-content-center p-3">
-    <div class="task-modal-card bg-white rounded-4 shadow-lg overflow-hidden border">
-      <!-- Header -->
-      <div class="p-3 bg-dark text-white d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <mat-icon class="text-primary">playlist_add</mat-icon>
-          <h6 class="mb-0 fw-bold">Create New Task / Bug Ticket</h6>
-        </div>
-        <button type="button" class="btn-close btn-close-white" (click)="closeNewTaskModal()"></button>
+  <!-- Create / Edit Task Modal Overlay -->
+  <div class="modal-backdrop" *ngIf="showTaskModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>{{ modalTitle }}</h3>
+        <button class="btn-close" (click)="closeTaskModal()"><mat-icon>close</mat-icon></button>
       </div>
 
-      <!-- Form Body -->
-      <div class="p-4">
-        <div class="mb-3">
-          <label class="form-label fw-semibold small">Task Title*</label>
-          <input type="text" [(ngModel)]="newTask.title" placeholder="e.g. Implement OpenFeign circuit breaker fallback" class="form-control" />
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Issue Title *</label>
+          <input type="text" [(ngModel)]="taskForm.title" placeholder="e.g. Implement OpenFeign Inter-service Client" />
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold small">Description</label>
-          <textarea [(ngModel)]="newTask.description" placeholder="Task requirements and acceptance criteria..." class="form-control" rows="3"></textarea>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="taskForm.description" rows="3" placeholder="Provide detailed task requirements..."></textarea>
         </div>
 
-        <div class="row g-3 mb-3">
-          <div class="col-6">
-            <label class="form-label fw-semibold small">Assignee</label>
-            <select [(ngModel)]="newTask.assigneeId" class="form-select">
-              <option [value]="undefined">Unassigned</option>
-              <option *ngFor="let emp of employees" [value]="emp.id">{{ emp.name }} ({{ emp.department }})</option>
+        <div class="form-row">
+          <div class="form-group half">
+            <label>Issue Type</label>
+            <select [(ngModel)]="taskForm.taskType">
+              <option value="STORY">📘 Story</option>
+              <option value="BUG">🐛 Bug</option>
+              <option value="TASK">📌 Task</option>
+              <option value="EPIC">⚡ Epic</option>
             </select>
           </div>
 
-          <div class="col-6">
-            <label class="form-label fw-semibold small">Priority</label>
-            <select [(ngModel)]="newTask.priority" class="form-select">
-              <option value="HIGH">HIGH</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="LOW">LOW</option>
+          <div class="form-group half">
+            <label>Priority</label>
+            <select [(ngModel)]="taskForm.priority">
+              <option value="CRITICAL">🔴 Critical</option>
+              <option value="HIGH">🟠 High</option>
+              <option value="MEDIUM">🟡 Medium</option>
+              <option value="LOW">🔵 Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label>Assignee</label>
+            <select [(ngModel)]="taskForm.assigneeId">
+              <option [value]="undefined">-- Select Employee --</option>
+              <option *ngFor="let emp of employees" [value]="emp.id">
+                {{ emp.name }} ({{ emp.department }})
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group half">
+            <label>Initial Status</label>
+            <select [(ngModel)]="taskForm.status">
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="IN_REVIEW">In Review</option>
+              <option value="DONE">Done</option>
             </select>
           </div>
         </div>
       </div>
 
-      <!-- Footer -->
-      <div class="p-3 bg-light border-top d-flex align-items-center justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4" (click)="closeNewTaskModal()">
-          Cancel
-        </button>
-        <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" (click)="submitNewTask()" [disabled]="!newTask.title.trim()">
-          Create Task
-        </button>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeTaskModal()">Cancel</button>
+        <button class="btn-save" (click)="submitTaskForm()">Save Issue</button>
       </div>
     </div>
   </div>

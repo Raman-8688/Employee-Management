@@ -17,11 +17,13 @@ interface ApiResponse<T> {
   timeStamp: string;
 }
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   private readonly TOKEN_KEY = 'access_token';
@@ -124,15 +126,26 @@ export class AuthService {
       console.log('Token saved to localStorage');
       
       if (user) {
-        if (!user.role && user.roles && user.roles.length > 0) {
-          user.role = user.roles[0];
-        } else if (!user.role) {
+        if (user.roles && Array.isArray(user.roles)) {
+          const roleList = user.roles.map((r: any) => typeof r === 'string' ? r : r.name);
+          if (roleList.includes('ROLE_ADMIN') || roleList.includes('ADMIN')) {
+            user.role = 'ROLE_ADMIN';
+          } else if (roleList.includes('ROLE_MANAGER') || roleList.includes('MANAGER')) {
+            user.role = 'ROLE_MANAGER';
+          } else if (roleList.includes('ROLE_HR') || roleList.includes('HR')) {
+            user.role = 'ROLE_HR';
+          } else if (roleList.length > 0) {
+            user.role = roleList[0];
+          }
+        }
+        if (!user.role) {
           user.role = 'ROLE_ADMIN';
         }
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
         console.log('User info saved:', user);
         this.currentUserSubject.next(user);
       }
+
       
       const savedToken = localStorage.getItem(this.TOKEN_KEY);
       console.log('Verification - Token saved:', savedToken ? 'Yes' : 'No');
@@ -180,18 +193,42 @@ export class AuthService {
   }
 
   hasRole(role: string): boolean {
-    const user = this.currentUserValue;
-    if (!user) return false;
-    if (user.role === role) return true;
-    if (user.roles && user.roles.includes(role)) return true;
-    return false;
+    return this.hasAnyRole([role]);
   }
 
   hasAnyRole(roles: string[]): boolean {
     const user = this.currentUserValue;
     if (!user) return false;
-    if (user.role && roles.includes(user.role)) return true;
-    if (user.roles && user.roles.some(r => roles.includes(r))) return true;
-    return false;
+
+    const userRoles: string[] = [];
+    if (user.role) userRoles.push(user.role);
+    if (user.roles && Array.isArray(user.roles)) {
+      user.roles.forEach((r: any) => {
+        if (typeof r === 'string') userRoles.push(r);
+        else if (r && r.name) userRoles.push(r.name);
+      });
+    }
+
+    const normalizedUserRoles = new Set<string>();
+    userRoles.forEach((r) => {
+      if (r) {
+        normalizedUserRoles.add(r.toUpperCase());
+        if (r.toUpperCase().startsWith('ROLE_')) {
+          normalizedUserRoles.add(r.toUpperCase().replace('ROLE_', ''));
+        } else {
+          normalizedUserRoles.add('ROLE_' + r.toUpperCase());
+        }
+      }
+    });
+
+    return roles.some((req) => {
+      if (!req) return false;
+      const upperReq = req.toUpperCase();
+      return (
+        normalizedUserRoles.has(upperReq) ||
+        (upperReq.startsWith('ROLE_') && normalizedUserRoles.has(upperReq.replace('ROLE_', ''))) ||
+        (!upperReq.startsWith('ROLE_') && normalizedUserRoles.has('ROLE_' + upperReq))
+      );
+    });
   }
 }
