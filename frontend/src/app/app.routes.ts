@@ -119,6 +119,16 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
       },
+      {
+        path: 'projects',
+        loadComponent: () =>
+          import('./components/project-knowledge/project-knowledge.component').then(
+            (m) => m.ProjectKnowledgeComponent
+          ),
+        canActivate: [RoleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+      },
+
 
     ],
   },

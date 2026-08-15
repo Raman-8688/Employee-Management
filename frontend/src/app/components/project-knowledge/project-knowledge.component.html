@@ -1,0 +1,572 @@
+<div class="project-knowledge-container">
+  <!-- TOP METRICS HEADER -->
+  <div class="metrics-header">
+    <div class="header-title-box">
+      <h2><mat-icon class="header-icon">business_center</mat-icon> Enterprise Application & Project Knowledge Hub</h2>
+      <p class="subtitle">Institutional architecture catalog tracking tech stacks, database schemas, stored procedures, screens & APIs across AMS, Pharma, and Construction projects</p>
+    </div>
+
+    <div class="metrics-cards">
+      <div class="metric-card">
+        <mat-icon class="card-icon total">folder_special</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ projects.length }}</span>
+          <span class="card-label">Total Projects</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon active">verified</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ projects.length }}</span>
+          <span class="card-label">Active Deployments</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon tech">layers</mat-icon>
+        <div class="card-data">
+          <span class="card-value">12+</span>
+          <span class="card-label">Tech Frameworks</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon docs">description</mat-icon>
+        <div class="card-data">
+          <span class="card-value">15+</span>
+          <span class="card-label">Arch Documents</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR & VIEW SWITCHER -->
+  <div class="board-toolbar">
+    <div class="view-switcher">
+      <button class="btn-toggle" [class.active]="activeViewMode === 'DIRECTORY'" (click)="switchViewMode('DIRECTORY')">
+        <mat-icon>grid_view</mat-icon> Projects Directory
+      </button>
+      <button class="btn-toggle" [class.active]="activeViewMode === 'INSPECTOR'" (click)="switchViewMode('INSPECTOR')">
+        <mat-icon>visibility</mat-icon> Project 360° Inspector
+      </button>
+      <button class="btn-toggle" [class.active]="activeViewMode === 'WIZARD'" (click)="switchViewMode('WIZARD')">
+        <mat-icon>add_box</mat-icon> Register New Project
+      </button>
+    </div>
+
+    <div class="filter-controls" *ngIf="activeViewMode === 'DIRECTORY'">
+      <div class="search-box">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="loadProjects()" placeholder="Search project, tech, table, screen..." />
+      </div>
+
+      <select [(ngModel)]="filterDomain" (change)="loadProjects()" class="select-filter">
+        <option value="ALL">All Domains</option>
+        <option value="AMS">AMS (Asset Mgmt)</option>
+        <option value="PHARMA">Pharma Clinical</option>
+        <option value="CONSTRUCTION">Construction ERP</option>
+        <option value="GENERAL">General</option>
+      </select>
+
+      <select [(ngModel)]="filterStatus" (change)="loadProjects()" class="select-filter">
+        <option value="ALL">All Statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="MAINTENANCE">Maintenance</option>
+        <option value="ARCHIVED">Archived</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- VIEW 1: PROJECTS DIRECTORY GRID -->
+  <div *ngIf="activeViewMode === 'DIRECTORY'" class="view-section">
+    <div class="projects-grid">
+      <div *ngFor="let prj of projects" class="project-card" (click)="selectProjectForInspector(prj)">
+        <div class="card-top">
+          <span class="code-badge">{{ prj.projectCode }}</span>
+          <span class="domain-badge" [ngClass]="prj.industryDomain">{{ prj.industryDomain }}</span>
+          <span class="status-pill" [ngClass]="prj.status">{{ prj.status }}</span>
+        </div>
+
+        <h3 class="prj-title">{{ prj.projectName }}</h3>
+        <p class="client-text" *ngIf="prj.clientName"><mat-icon>domain</mat-icon> Client: <strong>{{ prj.clientName }}</strong></p>
+        <p class="prj-desc">{{ prj.description | slice:0:110 }}...</p>
+
+        <!-- Tech Stack Badges -->
+        <div class="tech-pills">
+          <span *ngFor="let t of prj.techStacks" class="tech-pill" [ngClass]="t.category">
+            {{ t.technologyName }} <small *ngIf="t.version">v{{ t.version }}</small>
+          </span>
+        </div>
+
+        <div class="card-stats-row">
+          <span><mat-icon>storage</mat-icon> {{ prj.dbSchemas?.length || 0 }} DB Tables</span>
+          <span><mat-icon>web</mat-icon> {{ prj.screens?.length || 0 }} Screens</span>
+          <span><mat-icon>api</mat-icon> {{ prj.apiEndpoints?.length || 0 }} APIs</span>
+          <span><mat-icon>folder</mat-icon> {{ prj.documents?.length || 0 }} Docs</span>
+        </div>
+
+        <div class="card-action-bar">
+          <button class="btn-inspect"><mat-icon>analytics</mat-icon> Inspect Project 360°</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: PROJECT 360° INSPECTOR -->
+  <div *ngIf="activeViewMode === 'INSPECTOR' && selectedProject" class="view-section">
+    <!-- Selected Project Banner -->
+    <div class="project-banner">
+      <div class="banner-title-box">
+        <div class="code-domain-row">
+          <span class="code-badge">{{ selectedProject.projectCode }}</span>
+          <span class="domain-badge" [ngClass]="selectedProject.industryDomain">{{ selectedProject.industryDomain }}</span>
+          <span class="status-pill" [ngClass]="selectedProject.status">{{ selectedProject.status }}</span>
+        </div>
+        <h3>{{ selectedProject.projectName }}</h3>
+        <p class="client-text" *ngIf="selectedProject.clientName"><mat-icon>domain</mat-icon> Client: {{ selectedProject.clientName }} | Onboarded: {{ selectedProject.createdAt | date:'mediumDate' }}</p>
+        <p class="banner-desc">{{ selectedProject.description }}</p>
+      </div>
+
+      <div class="banner-actions">
+        <button class="btn-secondary" (click)="switchViewMode('DIRECTORY')"><mat-icon>arrow_back</mat-icon> Back to Directory</button>
+      </div>
+    </div>
+
+    <!-- Inspector Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeInspectorTab === 'OVERVIEW'" (click)="activeInspectorTab = 'OVERVIEW'">
+        <mat-icon>layers</mat-icon> Tech Stack & Arch ({{ selectedProject.techStacks?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeInspectorTab === 'SCHEMAS'" (click)="activeInspectorTab = 'SCHEMAS'">
+        <mat-icon>storage</mat-icon> Database & Schemas ({{ selectedProject.dbSchemas?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeInspectorTab === 'SCREENS'" (click)="activeInspectorTab = 'SCREENS'">
+        <mat-icon>web</mat-icon> Screens & Submenus ({{ selectedProject.screens?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeInspectorTab === 'APIS'" (click)="activeInspectorTab = 'APIS'">
+        <mat-icon>api</mat-icon> API Registry ({{ selectedProject.apiEndpoints?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeInspectorTab === 'DOCUMENTS'" (click)="activeInspectorTab = 'DOCUMENTS'">
+        <mat-icon>folder</mat-icon> Project Documents ({{ selectedProject.documents?.length || 0 }})
+      </button>
+    </div>
+
+    <!-- TAB 1: OVERVIEW & TECH STACK -->
+    <div *ngIf="activeInspectorTab === 'OVERVIEW'" class="inspector-tab-content">
+      <div class="tab-action-bar">
+        <h4><mat-icon>developer_board</mat-icon> Technology Stack Inventory</h4>
+        <button class="btn-primary" (click)="showAddTechStackModal = true"><mat-icon>add</mat-icon> Add Tech Stack</button>
+      </div>
+
+      <div class="tech-grid">
+        <div *ngFor="let t of selectedProject.techStacks" class="tech-card">
+          <div class="tech-cat-badge" [ngClass]="t.category">{{ t.category }}</div>
+          <h5 class="tech-name">{{ t.technologyName }} <span *ngIf="t.version">v{{ t.version }}</span></h5>
+          <p class="tech-notes" *ngIf="t.notes">{{ t.notes }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DATABASE & SCHEMAS -->
+    <div *ngIf="activeInspectorTab === 'SCHEMAS'" class="inspector-tab-content">
+      <div class="tab-action-bar">
+        <h4><mat-icon>table_chart</mat-icon> Database Tables & Stored Procedures Inventory</h4>
+        <button class="btn-primary" (click)="showAddDbSchemaModal = true"><mat-icon>add</mat-icon> Add Database Table</button>
+      </div>
+
+      <div class="list-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>DB Type</th>
+              <th>Schema</th>
+              <th>Table Name</th>
+              <th>Description</th>
+              <th>Columns Summary</th>
+              <th>Stored Procedures Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let db of selectedProject.dbSchemas" class="table-row">
+              <td><span class="db-type-badge">{{ db.dbType }}</span></td>
+              <td>{{ db.schemaName || 'public' }}</td>
+              <td><strong class="table-name-bold">{{ db.tableName }}</strong></td>
+              <td>{{ db.tableDescription || '-' }}</td>
+              <td class="columns-text">{{ db.columnsSummary || '-' }}</td>
+              <td><span class="proc-badge" *ngIf="db.storedProceduresUsed"><mat-icon>settings</mat-icon> {{ db.storedProceduresUsed }}</span></td>
+            </tr>
+            <tr *ngIf="!selectedProject.dbSchemas || selectedProject.dbSchemas.length === 0">
+              <td colspan="6" class="text-center py-4">No database schemas registered yet. Click <strong>Add Database Table</strong> to register a schema.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: SCREENS & SUBMENUS -->
+    <div *ngIf="activeInspectorTab === 'SCREENS'" class="inspector-tab-content">
+      <div class="tab-action-bar">
+        <h4><mat-icon>dashboard_customize</mat-icon> Registered Screens & Component Trees</h4>
+        <button class="btn-primary" (click)="showAddScreenModal = true"><mat-icon>add</mat-icon> Add Screen Registry</button>
+      </div>
+
+      <div class="list-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Screen Name</th>
+              <th>Submenu Path</th>
+              <th>Angular Components Involved</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of selectedProject.screens" class="table-row">
+              <td><span class="module-badge">{{ s.moduleName }}</span></td>
+              <td><strong>{{ s.screenName }}</strong></td>
+              <td><code class="code-path">{{ s.submenuPath || '-' }}</code></td>
+              <td><span class="component-text">{{ s.componentsInvolved || '-' }}</span></td>
+              <td>{{ s.description || '-' }}</td>
+            </tr>
+            <tr *ngIf="!selectedProject.screens || selectedProject.screens.length === 0">
+              <td colspan="5" class="text-center py-4">No screens registered yet. Click <strong>Add Screen Registry</strong> to document frontend screens.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: API REGISTRY -->
+    <div *ngIf="activeInspectorTab === 'APIS'" class="inspector-tab-content">
+      <div class="tab-action-bar">
+        <h4><mat-icon>http</mat-icon> REST API Endpoints Registry</h4>
+        <button class="btn-primary" (click)="showAddApiModal = true"><mat-icon>add</mat-icon> Add API Endpoint</button>
+      </div>
+
+      <div class="list-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>HTTP Method</th>
+              <th>Endpoint URL</th>
+              <th>Controller Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let api of selectedProject.apiEndpoints" class="table-row">
+              <td><span class="http-badge" [ngClass]="api.httpMethod">{{ api.httpMethod }}</span></td>
+              <td><code class="code-endpoint">{{ api.endpointUrl }}</code></td>
+              <td><strong>{{ api.controllerName || '-' }}</strong></td>
+              <td>{{ api.description || '-' }}</td>
+            </tr>
+            <tr *ngIf="!selectedProject.apiEndpoints || selectedProject.apiEndpoints.length === 0">
+              <td colspan="4" class="text-center py-4">No API endpoints registered yet. Click <strong>Add API Endpoint</strong> to register endpoints.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: PROJECT DOCUMENTS -->
+    <div *ngIf="activeInspectorTab === 'DOCUMENTS'" class="inspector-tab-content">
+      <div class="tab-action-bar">
+        <h4><mat-icon>folder_zip</mat-icon> Architecture Blueprints & Project Documents</h4>
+        <button class="btn-primary" (click)="showUploadDocModal = true"><mat-icon>upload_file</mat-icon> Upload Document</button>
+      </div>
+
+      <div class="docs-grid">
+        <div *ngFor="let doc of selectedProject.documents" class="doc-card">
+          <mat-icon class="doc-icon" [ngClass]="doc.fileType">description</mat-icon>
+          <div class="doc-info">
+            <h5 class="doc-title">{{ doc.documentTitle }}</h5>
+            <span class="doc-meta">Uploaded by {{ doc.uploadedBy || 'Lead' }} on {{ doc.uploadDate | date:'mediumDate' }}</span>
+          </div>
+          <a [href]="doc.filePath" target="_blank" class="btn-doc-download"><mat-icon>file_download</mat-icon> Download</a>
+        </div>
+        <div *ngIf="!selectedProject.documents || selectedProject.documents.length === 0" class="empty-docs">
+          <p>No architecture documents uploaded yet. Click <strong>Upload Document</strong> to add blueprints or specs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: PROJECT REGISTRATION WIZARD -->
+  <div *ngIf="activeViewMode === 'WIZARD'" class="view-section">
+    <div class="wizard-card">
+      <div class="wizard-header">
+        <h3><mat-icon>add_box</mat-icon> Enterprise Project Onboarding Wizard</h3>
+        <p>Document architecture, tech stacks, database schemas, and endpoints for a new organization project.</p>
+      </div>
+
+      <div class="wizard-steps-indicator">
+        <div class="step-num" [class.active]="wizardStep >= 1">1. Project Profile</div>
+        <div class="step-num" [class.active]="wizardStep >= 2">2. Industry & Status</div>
+        <div class="step-num" [class.active]="wizardStep >= 3">3. Confirmation & Submit</div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div *ngIf="wizardStep === 1" class="wizard-step-content">
+        <div class="form-group">
+          <label>Project Code * (e.g. PRJ-AMS-01)</label>
+          <input type="text" [(ngModel)]="wizardProject.projectCode" placeholder="Unique project code..." />
+        </div>
+
+        <div class="form-group">
+          <label>Project Name *</label>
+          <input type="text" [(ngModel)]="wizardProject.projectName" placeholder="Full project name..." />
+        </div>
+
+        <div class="form-group">
+          <label>Client Name / Sponsor</label>
+          <input type="text" [(ngModel)]="wizardProject.clientName" placeholder="Client or internal department..." />
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div *ngIf="wizardStep === 2" class="wizard-step-content">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Industry Domain</label>
+            <select [(ngModel)]="wizardProject.industryDomain">
+              <option value="AMS">Asset Management (AMS)</option>
+              <option value="PHARMA">Pharma Clinical</option>
+              <option value="CONSTRUCTION">Construction ERP</option>
+              <option value="GENERAL">General Enterprise</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Deployment Status</label>
+            <select [(ngModel)]="wizardProject.status">
+              <option value="ACTIVE">Active Production</option>
+              <option value="MAINTENANCE">Maintenance</option>
+              <option value="ARCHIVED">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Project Overview & Architecture Description</label>
+          <textarea [(ngModel)]="wizardProject.description" rows="4" placeholder="Overview of project purpose, architecture, and deployment target..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div *ngIf="wizardStep === 3" class="wizard-step-content">
+        <div class="summary-box">
+          <h4>Review Project Profile</h4>
+          <p><strong>Code:</strong> {{ wizardProject.projectCode }}</p>
+          <p><strong>Name:</strong> {{ wizardProject.projectName }}</p>
+          <p><strong>Client:</strong> {{ wizardProject.clientName || 'Internal' }}</p>
+          <p><strong>Domain:</strong> {{ wizardProject.industryDomain }}</p>
+          <p><strong>Status:</strong> {{ wizardProject.status }}</p>
+          <p><strong>Description:</strong> {{ wizardProject.description }}</p>
+        </div>
+      </div>
+
+      <div class="wizard-footer">
+        <button class="btn-secondary" *ngIf="wizardStep > 1" (click)="prevWizardStep()">Back</button>
+        <button class="btn-primary" (click)="nextWizardStep()">
+          {{ wizardStep === 3 ? 'Onboard Project' : 'Next Step' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS FOR ADDING CHILD TECH / SCHEMAS / SCREENS / APIS / DOCS -->
+
+  <!-- ADD TECH STACK MODAL -->
+  <div *ngIf="showAddTechStackModal" class="modal-backdrop" (click)="showAddTechStackModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Tech Stack Component</h3>
+        <button class="btn-close" (click)="showAddTechStackModal = false"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitTechStack()" class="modal-form">
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="newTechStack.category" name="category">
+            <option value="FRONTEND">Frontend Framework</option>
+            <option value="BACKEND">Backend Framework</option>
+            <option value="DATABASE">Database System</option>
+            <option value="DEVOPS">DevOps & Infra</option>
+            <option value="AI_INTEGRATION">AI Integration</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Technology Name * (e.g. Angular, Spring Boot, PostgreSQL)</label>
+          <input type="text" [(ngModel)]="newTechStack.technologyName" name="technologyName" required />
+        </div>
+
+        <div class="form-group">
+          <label>Version (e.g. 17.3, 3.3.2)</label>
+          <input type="text" [(ngModel)]="newTechStack.version" name="version" />
+        </div>
+
+        <div class="form-group">
+          <label>Architecture Notes</label>
+          <input type="text" [(ngModel)]="newTechStack.notes" name="notes" placeholder="e.g. Microservices & Feign Client" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showAddTechStackModal = false">Cancel</button>
+          <button type="submit" class="btn-primary">Save Tech Component</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD DB SCHEMA MODAL -->
+  <div *ngIf="showAddDbSchemaModal" class="modal-backdrop" (click)="showAddDbSchemaModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Database Table Schema</h3>
+        <button class="btn-close" (click)="showAddDbSchemaModal = false"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitDbSchema()" class="modal-form">
+        <div class="form-group">
+          <label>DB System</label>
+          <select [(ngModel)]="newDbSchema.dbType" name="dbType">
+            <option value="POSTGRESQL">PostgreSQL</option>
+            <option value="MYSQL">MySQL</option>
+            <option value="ORACLE">Oracle</option>
+            <option value="MONGODB">MongoDB</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Table Name *</label>
+          <input type="text" [(ngModel)]="newDbSchema.tableName" name="tableName" required placeholder="e.g. ams_assets" />
+        </div>
+
+        <div class="form-group">
+          <label>Table Description</label>
+          <input type="text" [(ngModel)]="newDbSchema.tableDescription" name="tableDescription" />
+        </div>
+
+        <div class="form-group">
+          <label>Columns Summary</label>
+          <input type="text" [(ngModel)]="newDbSchema.columnsSummary" name="columnsSummary" placeholder="e.g. id, serial_no, cost, status" />
+        </div>
+
+        <div class="form-group">
+          <label>Stored Procedures Used</label>
+          <input type="text" [(ngModel)]="newDbSchema.storedProceduresUsed" name="storedProceduresUsed" placeholder="e.g. sp_calculate_depreciation" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showAddDbSchemaModal = false">Cancel</button>
+          <button type="submit" class="btn-primary">Save Table Schema</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD SCREEN MODAL -->
+  <div *ngIf="showAddScreenModal" class="modal-backdrop" (click)="showAddScreenModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Registered Screen</h3>
+        <button class="btn-close" (click)="showAddScreenModal = false"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitScreen()" class="modal-form">
+        <div class="form-group">
+          <label>Module Name</label>
+          <input type="text" [(ngModel)]="newScreen.moduleName" name="moduleName" placeholder="e.g. Asset Operations" />
+        </div>
+
+        <div class="form-group">
+          <label>Screen Name *</label>
+          <input type="text" [(ngModel)]="newScreen.screenName" name="screenName" required placeholder="e.g. Asset Directory" />
+        </div>
+
+        <div class="form-group">
+          <label>Submenu Path</label>
+          <input type="text" [(ngModel)]="newScreen.submenuPath" name="submenuPath" placeholder="e.g. /dashboard/ams/assets" />
+        </div>
+
+        <div class="form-group">
+          <label>Components Involved</label>
+          <input type="text" [(ngModel)]="newScreen.componentsInvolved" name="componentsInvolved" placeholder="e.g. AssetListComponent, DetailModal" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showAddScreenModal = false">Cancel</button>
+          <button type="submit" class="btn-primary">Save Screen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD API MODAL -->
+  <div *ngIf="showAddApiModal" class="modal-backdrop" (click)="showAddApiModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add REST API Endpoint</h3>
+        <button class="btn-close" (click)="showAddApiModal = false"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitApi()" class="modal-form">
+        <div class="form-group">
+          <label>HTTP Method</label>
+          <select [(ngModel)]="newApi.httpMethod" name="httpMethod">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Endpoint URL *</label>
+          <input type="text" [(ngModel)]="newApi.endpointUrl" name="endpointUrl" required placeholder="e.g. /api/ams/assets" />
+        </div>
+
+        <div class="form-group">
+          <label>Controller Name</label>
+          <input type="text" [(ngModel)]="newApi.controllerName" name="controllerName" placeholder="e.g. AssetController" />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" [(ngModel)]="newApi.description" name="description" />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showAddApiModal = false">Cancel</button>
+          <button type="submit" class="btn-primary">Save API Endpoint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- UPLOAD DOC MODAL -->
+  <div *ngIf="showUploadDocModal" class="modal-backdrop" (click)="showUploadDocModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Upload Architecture Document</h3>
+        <button class="btn-close" (click)="showUploadDocModal = false"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitDocumentUpload()" class="modal-form">
+        <div class="form-group">
+          <label>Select Architecture Document (PDF, DOCX, ZIP, Image)</label>
+          <input type="file" (change)="onDocumentFileSelected($event)" accept=".pdf,.docx,.doc,.zip,.png,.jpg,.jpeg" required />
+          <span class="file-hint" *ngIf="selectedDocFile">Selected file: {{ selectedDocFile.name }}</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showUploadDocModal = false">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="!selectedDocFile">Upload Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

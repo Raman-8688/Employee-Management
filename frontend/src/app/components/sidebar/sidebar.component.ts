@@ -37,6 +37,22 @@ export class SidebarComponent implements OnInit {
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard/home' },
     {
+      id: 'projects',
+      icon: 'business_center',
+      label: 'Enterprise Projects',
+      badge: 3,
+      subItems: [
+        { icon: 'grid_view', label: 'Projects Directory', route: '/dashboard/projects', queryParams: { view: 'DIRECTORY' } },
+        { icon: 'visibility', label: 'Project 360° Inspector', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'OVERVIEW' } },
+        { icon: 'layers', label: 'Tech Stack & Architecture', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'OVERVIEW' } },
+        { icon: 'storage', label: 'Database & Schemas', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'SCHEMAS' } },
+        { icon: 'web', label: 'Screens & Submenus', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'SCREENS' } },
+        { icon: 'api', label: 'API Endpoints Registry', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'APIS' } },
+        { icon: 'folder', label: 'Architecture Documents', route: '/dashboard/projects', queryParams: { view: 'INSPECTOR', tab: 'DOCUMENTS' } },
+        { icon: 'add_box', label: 'Register New Project', route: '/dashboard/projects', queryParams: { view: 'WIZARD' } }
+      ]
+    },
+    {
       id: 'tasks',
       icon: 'task_alt',
       label: 'Tasks & Projects',
