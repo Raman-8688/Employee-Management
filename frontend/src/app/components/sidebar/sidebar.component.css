@@ -7,6 +7,7 @@
   transition: all 0.3s ease;
   position: relative;
   z-index: 100;
+  overflow: hidden;
 }
 
 .sidebar.collapsed {
@@ -39,8 +40,25 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 20px 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Amazon-Style Sliding Track & Panels */
+.sliding-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sliding-track.slide-active {
+  transform: translateX(-50%);
+}
+
+.menu-panel {
+  width: 50%;
+  box-sizing: border-box;
 }
 
 .nav-list {
@@ -61,6 +79,7 @@
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .nav-link:hover {
@@ -68,7 +87,8 @@
   color: #fff;
 }
 
-.nav-link.active {
+.nav-link.active,
+.parent-active {
   background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
   color: #fff;
   border-left: 3px solid #667eea;
@@ -85,6 +105,11 @@
   font-weight: 500;
 }
 
+.chevron-icon {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .badge {
   background: #ef4444;
   color: white;
@@ -92,6 +117,53 @@
   border-radius: 10px;
   font-size: 10px;
   font-weight: 600;
+  margin-right: 6px;
+}
+
+/* Amazon-Style Back Header & Submenu Header */
+.back-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.back-header:hover {
+  background: rgba(102, 126, 234, 0.2);
+  color: #fff;
+}
+
+.back-icon {
+  font-size: 18px;
+}
+
+.submenu-category-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
+}
+
+.title-icon {
+  font-size: 20px;
+  color: #667eea;
+}
+
+.sub-link {
+  padding-left: 24px;
 }
 
 .sidebar-footer {

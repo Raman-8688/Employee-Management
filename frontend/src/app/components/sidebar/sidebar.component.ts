@@ -4,11 +4,20 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 
-interface MenuItem {
+export interface SubMenuItem {
   icon: string;
   label: string;
   route: string;
   badge?: number;
+}
+
+export interface MenuItem {
+  id?: string;
+  icon: string;
+  label: string;
+  route?: string;
+  badge?: number;
+  subItems?: SubMenuItem[];
 }
 
 @Component({
@@ -21,26 +30,63 @@ interface MenuItem {
 export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   user: any;
+  activeCategory: MenuItem | null = null;
 
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard/home' },
-    { icon: 'task_alt', label: 'Tasks & Projects', route: '/dashboard/tasks', badge: 4 },
-    { icon: 'groups', label: 'People', route: '/dashboard/people', badge: 12 },
+    {
+      id: 'tasks',
+      icon: 'task_alt',
+      label: 'Tasks & Projects',
+      badge: 4,
+      subItems: [
+        { icon: 'view_kanban', label: 'Kanban Board', route: '/dashboard/tasks' },
+        { icon: 'view_list', label: 'Backlog & Tasks', route: '/dashboard/tasks' },
+        { icon: 'history_toggle_off', label: 'Time Tracking Logs', route: '/dashboard/tasks' },
+        { icon: 'query_stats', label: 'Sprint Analytics', route: '/dashboard/tasks' }
+      ]
+    },
+    {
+      id: 'people',
+      icon: 'groups',
+      label: 'People',
+      badge: 12,
+      subItems: [
+        { icon: 'contacts', label: 'Employee Directory', route: '/dashboard/people' },
+        { icon: 'insights', label: 'Performance Reviews', route: '/dashboard/performance' },
+        { icon: 'badge', label: 'Personal Details', route: '/dashboard/personal' },
+        { icon: 'work_history', label: 'Job & Reference', route: '/dashboard/job' }
+      ]
+    },
     { icon: 'payments', label: 'Payroll', route: '/dashboard/payroll' },
-    { icon: 'schedule', label: 'Time Tools', route: '/dashboard/time-tools' },
+    {
+      id: 'time',
+      icon: 'schedule',
+      label: 'Time Tools',
+      subItems: [
+        { icon: 'alarm_on', label: 'Attendance Clock', route: '/dashboard/time-tools' },
+        { icon: 'assignment', label: 'Timesheet Approvals', route: '/dashboard/time-tools' }
+      ]
+    },
     { icon: 'verified_user', label: 'Bonified', route: '/dashboard/bonified' },
-    { icon: 'insights', label: 'Performance', route: '/dashboard/performance' },
-    { icon: 'badge', label: 'Personal Details', route: '/dashboard/personal' },
-    { icon: 'work_history', label: 'Job & Reference', route: '/dashboard/job' },
     { icon: 'description', label: 'Document', route: '/dashboard/document' },
     { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' }
   ];
-
 
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
     this.user = this.authService.currentUserValue;
+  }
+
+  openSubmenu(item: MenuItem): void {
+    if (item.subItems && item.subItems.length > 0) {
+      this.activeCategory = item;
+    }
+  }
+
+  closeSubmenu(): void {
+    this.activeCategory = null;
   }
 
   getUserInitials(): string {

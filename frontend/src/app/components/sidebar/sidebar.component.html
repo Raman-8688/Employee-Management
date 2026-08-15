@@ -1,25 +1,60 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
     <div class="logo">
-      <mat-icon class="logo-icon">apartment</mat-icon>
+      
+      <!-- <mat-icon class="logo-icon">apartment/business/domain/location_city/business</mat-icon> -->
+        <mat-icon class="logo-icon">location_city</mat-icon>
       <span class="logo-text" *ngIf="!isCollapsed">winfo</span>
     </div>
   </div>
 
   <nav class="sidebar-nav">
-    <ul class="nav-list">
-      <li *ngFor="let item of menuItems" class="nav-item">
-        <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
-          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+    <div class="sliding-track" [class.slide-active]="activeCategory !== null">
+      <!-- MAIN MENU PANEL -->
+      <div class="menu-panel main-panel">
+        <ul class="nav-list">
+          <li *ngFor="let item of menuItems" class="nav-item">
+            <!-- Direct link item -->
+            <a *ngIf="!item.subItems" [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+              <span class="badge" *ngIf="item.badge && !isCollapsed">{{ item.badge }}</span>
+            </a>
 
-          <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+            <!-- Submenu parent item -->
+            <div *ngIf="item.subItems" (click)="openSubmenu(item)" class="nav-link parent-link" [class.parent-active]="activeCategory?.id === item.id">
+              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+              <span class="badge" *ngIf="item.badge && !isCollapsed">{{ item.badge }}</span>
+              <mat-icon class="chevron-icon" *ngIf="!isCollapsed">chevron_right</mat-icon>
+            </div>
+          </li>
+        </ul>
+      </div>
 
-          <span class="badge" *ngIf="item.badge && !isCollapsed">
-            {{ item.badge }}
-          </span>
-        </a>
-      </li>
-    </ul>
+      <!-- SUBMENU PANEL (AMAZON-STYLE) -->
+      <div class="menu-panel sub-panel">
+        <div class="back-header" (click)="closeSubmenu()">
+          <mat-icon class="back-icon">arrow_back</mat-icon>
+          <span>MAIN MENU</span>
+        </div>
+
+        <div class="submenu-category-title" *ngIf="activeCategory">
+          <mat-icon class="title-icon">{{ activeCategory.icon }}</mat-icon>
+          <span>{{ activeCategory.label }}</span>
+        </div>
+
+        <ul class="nav-list" *ngIf="activeCategory">
+          <li *ngFor="let sub of activeCategory.subItems" class="nav-item">
+            <a [routerLink]="sub.route" routerLinkActive="active" class="nav-link sub-link">
+              <mat-icon class="nav-icon">{{ sub.icon }}</mat-icon>
+              <span class="nav-label">{{ sub.label }}</span>
+              <span class="badge" *ngIf="sub.badge">{{ sub.badge }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </nav>
 
   <div class="sidebar-footer" *ngIf="!isCollapsed && user">
