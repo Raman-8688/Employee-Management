@@ -211,10 +211,14 @@ public class AuthService {
 
         Set<Role> roles = new HashSet<>();
         if (request.getRoles() == null || request.getRoles().isEmpty()) {
-            Role userRole = roleRepository.findByName("ROLE_EMPLOYEE")
+            Role empRole = roleRepository.findByName("ROLE_EMPLOYEE")
                     .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_EMPLOYEE").build()));
+            Role userRole = roleRepository.findByName("ROLE_USER")
+                    .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_USER").build()));
+            roles.add(empRole);
             roles.add(userRole);
         } else {
+
             request.getRoles().forEach(roleName -> {
                 Role role = roleRepository.findByName(roleName)
                         .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
