@@ -89,8 +89,10 @@ export class SidebarComponent implements OnInit {
     },
     { icon: 'verified_user', label: 'Bonified', route: '/dashboard/bonified' },
     { icon: 'description', label: 'Document', route: '/dashboard/document' },
-    { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' }
+    { icon: 'smart_toy', label: 'AI Copilot', route: '/dashboard/ai-copilot' },
+    { icon: 'notifications_active', label: 'Notification Center', route: '/dashboard/notifications', badge: 3 }
   ];
+
 
   constructor(private authService: AuthService) {}
 

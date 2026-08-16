@@ -124,6 +124,126 @@
   font-weight: bold;
 }
 
+/* NOTIFICATIONS BELL DROPDOWN */
+.notif-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  width: 340px;
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.unread-chip {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.quick-notif-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.quick-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #334155;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.quick-notif-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.quick-icon-box {
+  margin-top: 2px;
+}
+
+.quick-cat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.quick-cat-icon.TASK { color: #60a5fa; }
+.quick-cat-icon.HR { color: #c084fc; }
+.quick-cat-icon.SYSTEM { color: #34d399; }
+.quick-cat-icon.ALERT { color: #f87171; }
+
+.quick-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quick-item-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.quick-item-msg {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.empty-quick {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.dropdown-footer {
+  padding: 12px 16px;
+  background: #0f172a;
+  border-top: 1px solid #334155;
+  color: #818cf8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.dropdown-footer:hover {
+  color: #ffffff;
+}
+
+
 .user-menu {
   position: relative;
   cursor: pointer;

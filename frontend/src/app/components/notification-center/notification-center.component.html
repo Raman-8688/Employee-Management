@@ -1,0 +1,186 @@
+<div class="notification-center-container">
+  <!-- TOP METRICS HEADER -->
+  <div class="metrics-header">
+    <div class="header-title-box">
+      <h2><mat-icon class="header-icon">notifications_active</mat-icon> Real-Time Notification & Event Center</h2>
+      <p class="subtitle">Central delivery ledger tracking system alerts, task assignments, HR approvals, and microservice webhook dispatches</p>
+    </div>
+
+    <div class="metrics-cards">
+      <div class="metric-card">
+        <mat-icon class="card-icon total">notifications</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ metrics?.totalCount || notifications.length }}</span>
+          <span class="card-label">Total Notifications</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon unread">mark_email_unread</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ unreadNotificationsCount }}</span>
+          <span class="card-label">Unread Alerts</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon sent">check_circle</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ metrics?.sentCount || 4 }}</span>
+          <span class="card-label">Delivered (Sent)</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <mat-icon class="card-icon rate">speed</mat-icon>
+        <div class="card-data">
+          <span class="card-value">{{ metrics?.deliverySuccessRate || 95 }}%</span>
+          <span class="card-label">Delivery Success</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR & CATEGORY FILTER TABS -->
+  <div class="board-toolbar">
+    <div class="view-switcher">
+      <button class="btn-toggle" [class.active]="filterCategory === 'ALL' && !unreadOnly" (click)="filterCategory = 'ALL'; unreadOnly = false; loadNotifications()">
+        <mat-icon>dataset</mat-icon> All Notifications
+      </button>
+      <button class="btn-toggle" [class.active]="unreadOnly" (click)="unreadOnly = !unreadOnly; loadNotifications()">
+        <mat-icon>mark_email_unread</mat-icon> Unread Only
+      </button>
+      <button class="btn-toggle" [class.active]="filterCategory === 'TASK'" (click)="filterCategory = 'TASK'; unreadOnly = false; loadNotifications()">
+        <mat-icon>task_alt</mat-icon> Tasks & Projects
+      </button>
+      <button class="btn-toggle" [class.active]="filterCategory === 'HR'" (click)="filterCategory = 'HR'; unreadOnly = false; loadNotifications()">
+        <mat-icon>badge</mat-icon> HR & Appraisals
+      </button>
+      <button class="btn-toggle" [class.active]="filterCategory === 'SYSTEM'" (click)="filterCategory = 'SYSTEM'; unreadOnly = false; loadNotifications()">
+        <mat-icon>settings_suggest</mat-icon> System & Infra
+      </button>
+      <button class="btn-toggle" [class.active]="filterCategory === 'ALERT'" (click)="filterCategory = 'ALERT'; unreadOnly = false; loadNotifications()">
+        <mat-icon>warning</mat-icon> Critical Alerts
+      </button>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="btn-secondary" (click)="markAllAsRead()">
+        <mat-icon>done_all</mat-icon> Mark All as Read
+      </button>
+      <button class="btn-primary" (click)="openDispatchModal()">
+        <mat-icon>send</mat-icon> Test Dispatch Alert
+      </button>
+    </div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="filter-controls">
+    <div class="search-box">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search notification content, titles, keywords..." />
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS CARDS LIST -->
+  <div class="notifications-list">
+    <div *ngFor="let item of filteredNotificationsList" 
+         class="notif-card" 
+         [class.unread-card]="!item.readStatus"
+         [class.failed-card]="item.status === 'FAILED'"
+         (click)="markAsRead(item)">
+      
+      <div class="notif-left-icon">
+        <mat-icon [ngClass]="item.category" class="cat-icon">
+          {{ item.category === 'TASK' ? 'task_alt' : (item.category === 'HR' ? 'badge' : (item.category === 'ALERT' ? 'warning' : 'settings_suggest')) }}
+        </mat-icon>
+      </div>
+
+      <div class="notif-body">
+        <div class="notif-top-row">
+          <span class="cat-badge" [ngClass]="item.category">{{ item.category }}</span>
+          <span class="priority-badge" [ngClass]="item.priority">{{ item.priority }} Priority</span>
+          <span class="status-badge" [ngClass]="item.status || 'SENT'">{{ item.status || 'SENT' }}</span>
+          <span class="time-stamp">{{ item.createdAt | date:'medium' }}</span>
+          <span class="unread-dot" *ngIf="!item.readStatus" title="Unread Alert"></span>
+        </div>
+
+        <h4 class="notif-title">{{ item.title }}</h4>
+        <p class="notif-message">{{ item.message }}</p>
+
+        <!-- Debug Error Message if Failed -->
+        <div class="error-box" *ngIf="item.status === 'FAILED' && item.errorMessage">
+          <mat-icon>bug_report</mat-icon> <span>Failure Cause: {{ item.errorMessage }}</span>
+        </div>
+      </div>
+
+      <div class="notif-actions" (click)="$event.stopPropagation()">
+        <button class="btn-icon" *ngIf="!item.readStatus" (click)="markAsRead(item)" title="Mark as Read">
+          <mat-icon>check</mat-icon>
+        </button>
+        <button class="btn-icon danger" (click)="deleteNotification(item)" title="Delete Alert">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredNotificationsList.length === 0" class="empty-notif-box">
+      <mat-icon class="empty-icon">notifications_off</mat-icon>
+      <h3>No Notifications Found</h3>
+      <p>You have no notifications matching the selected filter criteria.</p>
+    </div>
+  </div>
+
+  <!-- TEST DISPATCH NOTIFICATION MODAL -->
+  <div *ngIf="showDispatchModal" class="modal-backdrop" (click)="closeDispatchModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3><mat-icon>send</mat-icon> Dispatch Test Event Notification</h3>
+        <button class="btn-close" (click)="closeDispatchModal()"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form (ngSubmit)="submitDispatchForm()" class="modal-form">
+        <div class="form-group">
+          <label>Notification Title *</label>
+          <input type="text" [(ngModel)]="dispatchForm.title" name="title" required placeholder="e.g. Task Assigned / System Deployment" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Category</label>
+            <select [(ngModel)]="dispatchForm.category" name="category">
+              <option value="TASK">Task Event</option>
+              <option value="HR">HR & Payroll Event</option>
+              <option value="SYSTEM">System Infrastructure</option>
+              <option value="ALERT">Critical Alert</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Priority</label>
+            <select [(ngModel)]="dispatchForm.priority" name="priority">
+              <option value="HIGH">High Priority</option>
+              <option value="MEDIUM">Medium Priority</option>
+              <option value="LOW">Low Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Recipient Email</label>
+          <input type="email" [(ngModel)]="dispatchForm.recipientEmail" name="recipientEmail" placeholder="admin@company.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Message Content *</label>
+          <textarea [(ngModel)]="dispatchForm.message" name="message" rows="3" required placeholder="Notification body details..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeDispatchModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Dispatch Alert</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

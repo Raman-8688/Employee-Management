@@ -128,6 +128,16 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
       },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./components/notification-center/notification-center.component').then(
+            (m) => m.NotificationCenterComponent
+          ),
+        canActivate: [RoleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+      },
+
 
 
     ],

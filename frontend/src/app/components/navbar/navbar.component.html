@@ -16,13 +16,45 @@
       <input type="text" placeholder="Search employees, departments..." class="search-input">
     </div>
     
+    <!-- NOTIFICATIONS BELL BUTTON & DROPDOWN -->
     <div class="notifications">
-      <button class="icon-btn">
+      <button class="icon-btn" (click)="toggleNotifMenu()">
         <mat-icon>notifications</mat-icon>
+        <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </button>
-      <span class="notification-badge">3</span>
+
+      <!-- Quick Notifications Preview Dropdown -->
+      <div class="notif-dropdown" *ngIf="showNotifMenu">
+        <div class="dropdown-header">
+          <span class="dropdown-title">Notifications</span>
+          <span class="unread-chip">{{ unreadCount }} Unread</span>
+        </div>
+
+        <div class="quick-notif-list">
+          <div *ngFor="let item of quickNotifications" class="quick-notif-item" (click)="openNotificationCenter()">
+            <div class="quick-icon-box">
+              <mat-icon class="quick-cat-icon" [ngClass]="item.category">
+                {{ item.category === 'TASK' ? 'task_alt' : (item.category === 'HR' ? 'badge' : 'warning') }}
+              </mat-icon>
+            </div>
+            <div class="quick-text-box">
+              <div class="quick-item-title">{{ item.title }}</div>
+              <div class="quick-item-msg">{{ item.message | slice:0:50 }}...</div>
+            </div>
+          </div>
+          <div *ngIf="quickNotifications.length === 0" class="empty-quick">
+            No recent unread alerts.
+          </div>
+        </div>
+
+        <div class="dropdown-footer" (click)="openNotificationCenter()">
+          <span>View All Notification Center</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </div>
+      </div>
     </div>
     
+    <!-- USER PROFILE MENU -->
     <div class="user-menu" (click)="toggleUserMenu()">
       <div class="user-avatar">
         {{ getUserName().charAt(0) }}
