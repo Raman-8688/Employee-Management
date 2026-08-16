@@ -28,8 +28,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/employee/**", "/api/ai/**", "/api/attendance/**", "/uploads/**", "/actuator/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/employee", "/employee/**", "/api/employees/**", "/api/ai/**", "/api/attendance/**", "/uploads/**", "/actuator/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

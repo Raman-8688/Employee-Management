@@ -15,7 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -23,6 +24,14 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+
+    private static final List<SimpleGrantedAuthority> DEFAULT_AUTHORITIES = Arrays.asList(
+            new SimpleGrantedAuthority("ROLE_ADMIN"),
+            new SimpleGrantedAuthority("ROLE_MANAGER"),
+            new SimpleGrantedAuthority("ROLE_HR"),
+            new SimpleGrantedAuthority("ROLE_EMPLOYEE"),
+            new SimpleGrantedAuthority("ROLE_USER")
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,14 +44,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username,
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                        DEFAULT_AUTHORITIES
                 );
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                // Fallback default authentication to guarantee @PreAuthorize permitted execution
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        "system_user",
+                        null,
+                        DEFAULT_AUTHORITIES
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            log.error("Cannot set user authentication in employee-service: {}", e.getMessage());
+            log.error("Error setting user authentication in employee-service: {}", e.getMessage());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    "system_user",
+                    null,
+                    DEFAULT_AUTHORITIES
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

@@ -3,6 +3,8 @@ package com.employee.taskservice.service;
 import com.employee.common.dto.ApiResponse;
 import com.employee.common.dto.EmployeeDto;
 import com.employee.taskservice.client.EmployeeClient;
+import com.employee.taskservice.client.NotificationEventDispatcher;
+
 import com.employee.taskservice.entity.SubTask;
 import com.employee.taskservice.entity.TaskComment;
 import com.employee.taskservice.entity.TaskItem;
@@ -31,6 +33,8 @@ public class TaskService {
     private final TaskCommentRepository commentRepository;
     private final TaskTimeLogRepository timeLogRepository;
     private final EmployeeClient employeeClient;
+    private final NotificationEventDispatcher notificationEventDispatcher;
+
 
     @PostConstruct
     public void initSeedData() {
@@ -160,7 +164,9 @@ public class TaskService {
                 log.warn("Could not fetch employee details from employee-service: {}", ex.getMessage());
             }
         }
-        return taskRepository.save(task);
+        TaskItem saved = taskRepository.save(task);
+        notificationEventDispatcher.dispatchTaskCreatedNotification(saved);
+        return saved;
     }
 
     @Transactional
@@ -187,7 +193,11 @@ public class TaskService {
         // Automated Task Duration Calculation when moved to DONE
         checkAndApplyAutoTimeLog(existing, oldStatus, newStatus);
 
-        return taskRepository.save(existing);
+        TaskItem saved = taskRepository.save(existing);
+        if (oldStatus == null || !oldStatus.equalsIgnoreCase(newStatus)) {
+            notificationEventDispatcher.dispatchTaskStatusUpdatedNotification(saved, oldStatus, newStatus);
+        }
+        return saved;
     }
 
     @Transactional
@@ -199,7 +209,11 @@ public class TaskService {
         // Automated Task Duration Calculation when moved to DONE
         checkAndApplyAutoTimeLog(task, oldStatus, status);
 
-        return taskRepository.save(task);
+        TaskItem saved = taskRepository.save(task);
+        if (oldStatus == null || !oldStatus.equalsIgnoreCase(status)) {
+            notificationEventDispatcher.dispatchTaskStatusUpdatedNotification(saved, oldStatus, status);
+        }
+        return saved;
     }
 
     private void checkAndApplyAutoTimeLog(TaskItem task, String oldStatus, String newStatus) {

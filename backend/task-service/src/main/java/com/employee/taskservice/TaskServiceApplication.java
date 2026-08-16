@@ -12,10 +12,14 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+import org.springframework.scheduling.annotation.EnableAsync;
+
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableAsync
 public class TaskServiceApplication {
+
 
     public static void main(String[] args) {
         SpringApplication.run(TaskServiceApplication.class, args);

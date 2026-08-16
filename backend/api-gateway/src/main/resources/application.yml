@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  codec:
+    max-in-memory-size: 20MB
   cloud:
     gateway:
       discovery:
@@ -11,7 +13,6 @@ spring:
           enabled: true
           lower-case-service-id: false
       globalcors:
-
         cors-configurations:
           '[/**]':
             allowedOrigins: "http://localhost:4200"
@@ -29,28 +30,27 @@ spring:
         - id: auth-service
           uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth/**, /api/auth/**
+            - Path=/auth, /auth/**, /api/auth/**
 
         - id: employee-service
           uri: lb://EMPLOYEE-SERVICE
           predicates:
-            - Path=/employee/**, /api/employees/**, /api/ai/**, /api/attendance/**, /uploads/**
+            - Path=/employee, /employee/**, /api/employees, /api/employees/**, /api/ai/**, /api/attendance/**, /uploads/**
 
         - id: task-service
           uri: lb://TASK-SERVICE
           predicates:
-            - Path=/api/tasks/**
+            - Path=/api/tasks, /api/tasks/**
 
         - id: project-knowledge-service
           uri: lb://PROJECT-KNOWLEDGE-SERVICE
           predicates:
-            - Path=/api/projects/**, /project-docs/**
+            - Path=/api/projects, /api/projects/**, /project-docs/**
 
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
-            - Path=/api/notifications/**
-
+            - Path=/api/notifications, /api/notifications/**
 
 
 eureka:
