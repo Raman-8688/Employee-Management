@@ -1,16 +1,19 @@
 # 🌐 Nexus 360 Enterprise Platform
 
-> **Formerly Winfo / Employee System** — Upgraded into an Industrial-Grade, Resilient, Cloud-Native **Nexus Enterprise Hub** connecting Enterprise Applications (AMS, Pharma, Construction), Database Schemas, REST APIs, Jira Sprint Velocity, and Nvidia GenAI Copilot Intelligence.
+> **Industrial-Grade Cloud-Native Microservices Architecture** | **Architect:** [Ramanjaneyulu Boya](https://raman-8688.github.io/portfolio-projects/)
+> 
+> *Connecting Enterprise Workforce Intelligence, Jira Sprint Velocity, Project Knowledge 360°, Real-Time Notification Publishing, and Nvidia GenAI Copilot.*
 
 ---
 
-## 🌟 Executive Summary & High-Tech Vision
+## 📸 Authentication & Platform Showcase
 
-**Nexus 360 Enterprise Platform** serves as the central neural nexus for modern tech and engineering organizations. It bridges corporate silos by connecting:
-1. **Application & Knowledge Governance:** Central lookup for tech stacks, database schemas, stored procedures, screen components, and API endpoints across vertical domains (AMS - Asset Management System, Pharma Clinical Suite, Construction ERP).
-2. **Jira-Style Sprint & Time Velocity:** Kanban board with automated time calculation upon task completion and task learnings knowledge base.
-3. **Nvidia GenAI Copilot Intelligence:** Multi-model resilient LLM assistant with voice input/output and document analysis.
-4. **Workforce Operations:** Directory, attendance clock, audit ledger, and payroll engine.
+![Nexus 360 Split-Screen Login Page](file:///C:/Users/admin/.gemini/antigravity/brain/b4917d56-28aa-4b63-b24f-67a99b15155b/.user_uploaded/media_1786887016969.png)
+
+### 🌟 Key Highlights
+- **Split-Screen Interactive Layout**: Dual-panel design uniting an active sign-in form on the left with an animated platform showcase & developer portfolio hub on the right.
+- **Mandatory Employee Directory Pre-Verification**: During account registration, `auth-service` performs real-time pre-validation (`GET /employee/verify-email`) against `employee-service` to ensure only verified employees present in the company directory can create an account.
+- **Developer Portfolio Integration**: Instant access to the Platform Architect's interactive portfolio ([`https://raman-8688.github.io/portfolio-projects/`](https://raman-8688.github.io/portfolio-projects/)), GitHub ([`Raman-8688`](https://github.com/Raman-8688)), and LinkedIn profile.
 
 ---
 
@@ -18,7 +21,7 @@
 
 ```
                                   +-----------------------+
-                                  |    Angular 19 SPA     |
+                                  |    Angular 18 SPA     |
                                   | (http://localhost:4200)|
                                   +-----------+-----------+
                                               |
@@ -28,16 +31,16 @@
                                   | (http://localhost:8080)|
                                   +-----------+-----------+
                                               |
-                        +---------------------+---------------------+
-                        |                     |                     |
-                        v                     v                     v
-              +-------------------+ +-------------------+ +-------------------+ +-----------------------+
-              |   auth-service    | |  employee-service | |   task-service    | |project-knowledge-service|
-              | (Port: 8081)      | | (Port: 8082)      | | (Port: 8083)      | | (Port: 8084)          |
-              | DB: auth_db       | | DB: emp_db        | | DB: task_db       | | DB: project_knowledge_db|
-              +-------------------+ +-------------------+ +-------------------+ +-----------------------+
-                        ^                     ^                     ^                     ^
-                        +---------------------+---------------------+---------------------+
+      +---------------------+-----------------+---------------------+---------------------+
+      |                     |                 |                     |                     |
+      v                     v                 v                     v                     v
++-----------+         +-----------+     +-----------+         +-----------+         +-----------+
+|auth-serv. |         |emp-service|     |task-serv. |         |proj-know. |         |notif-serv.|
+|(Port 8081)|         |(Port 8082)|     |(Port 8083)|         |(Port 8084)|         |(Port 8085)|
+|DB:auth_db |         |DB: emp_db |     |DB: task_db|         |DB:proj_k_db|        |DB:notif_db|
++-----------+         +-----------+     +-----------+         +-----------+         +-----------+
+      ^                     ^                 ^                     ^                     ^
+      +---------------------+-----------------+---------------------+---------------------+
                                               |
                                   +-----------+-----------+
                                   |    Eureka Registry    |
@@ -49,20 +52,29 @@
 
 ## 🗄️ Microservices Database Isolation Matrix
 
-Every microservice operates on its dedicated relational database to guarantee domain boundary compliance:
+Every microservice operates on its dedicated relational database to enforce strict domain boundary compliance:
 
 | Microservice | Port | Service ID | Dedicated Database | Scope & Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| `auth-service` | `8081` | `AUTH-SERVICE` | `auth_db` | User authentication, security roles (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_EMPLOYEE`), JWT issuance |
-| `employee-service` | `8082` | `EMPLOYEE-SERVICE` | `emp_db` | Employee directory, payroll records, attendance logs, Nvidia AI copilot engine |
-| `task-service` | `8083` | `TASK-SERVICE` | `task_db` | Jira tasks, subtask checklists, time tracking, velocity metrics, learnings attachments |
-| **`project-knowledge-service`** | **`8084`** | **`PROJECT-KNOWLEDGE-SERVICE`** | **`project_knowledge_db`** | **Nexus project catalog, tech stacks, database schemas, stored procedures, screens, APIs & docs** |
+| `auth-service` | `8081` | `AUTH-SERVICE` | `auth_db` | JWT Token issuance, authentication, Security Roles (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_HR`, `ROLE_EMPLOYEE`, `ROLE_USER`), Employee Directory Pre-Verification |
+| `employee-service` | `8082` | `EMPLOYEE-SERVICE` | `emp_db` | HR Employee directory, 10MB multipart profile photo upload, attendance audit ledger, itemized payroll, Nvidia GenAI Copilot |
+| `task-service` | `8083` | `TASK-SERVICE` | `task_db` | Jira Kanban tasks, subtask checklists, time tracking, velocity metrics, learnings knowledge attachments |
+| `project-knowledge-service` | `8084` | `PROJECT-KNOWLEDGE-SERVICE` | `project_knowledge_db` | Enterprise project catalog, tech stacks, database schemas, stored procedures, screen registries, API endpoint catalog |
+| **`notification-service`** | **`8085`** | **`NOTIFICATION-SERVICE`** | **`notification_db`** | **Real-time event notification center, asynchronous event dispatcher, unread badge counter, DB ledger** |
 
 ---
 
 ## 💎 Core Pillars & Enterprise Modules
 
-### 🏢 1. Nexus Enterprise Application & Project Knowledge Hub (`project-knowledge-service`)
+### 🔔 1. Real-Time Cross-Service Notification Center (`notification-service`)
+- **Port:** `8085` | **Dedicated Database:** `notification_db`
+- **Event-Driven Architecture**: Asynchronously listens for system events across microservices:
+  - **Task Events**: Triggers alerts when a task is created or status transitions (e.g. `TODO` $\rightarrow$ `IN_PROGRESS` $\rightarrow$ `DONE`).
+  - **HR Onboarding Events**: Triggers alerts when a new employee is onboarded or profile details are updated.
+- **Top Navbar Bell Widget**: Dynamic badge counter showing unread notifications with auto-polling (interval 10s) and quick-preview dropdown menu.
+- **Notification Center Hub (`/dashboard/notifications`)**: Full-screen notification hub with KPI metric cards, category filter tabs (`ALL`, `TASK`, `SYSTEM`, `HR`, `ALERT`), mark as read, and test event dispatcher modal.
+
+### 🏢 2. Project Knowledge 360° Inspector (`project-knowledge-service`)
 - **Port:** `8084` | **Dedicated Database:** `project_knowledge_db`
 - **Domain Project Catalog:** Central tracking for enterprise applications across **AMS (Asset Management System)**, **Pharma Clinical Suite**, **Construction ERP**, and **General Enterprise**.
 - **Project 360° Inspector:** Deep architectural inspection with 5 dedicated tabs:
@@ -71,32 +83,24 @@ Every microservice operates on its dedicated relational database to guarantee do
   3. *Screens & Submenus Registry:* Registered modules, Angular component trees, and submenu paths.
   4. *API Endpoints Registry:* REST endpoints list with HTTP method badges (`GET`, `POST`, `PUT`, `DELETE`).
   5. *Architecture Documents Repository:* File repository with upload & download support for PDFs, specifications, and architecture diagrams under `/project-docs/`.
-- **Project Registration Wizard:** Multi-step onboarding form allowing architects and leads to document new projects from scratch.
 
-### 📌 2. Jira-Style Task Management, Velocity & Time Tracking (`task-service`)
+### 📌 3. Jira-Style Task Management, Velocity & Time Tracking (`task-service`)
 - **Port:** `8083` | **Dedicated Database:** `task_db`
+- **Sprint Analytics KPI Hub:** Modern velocity summary cards, hours logged progress bars, bugs resolved tracker, and sprint health ratios.
 - **Interactive Kanban Board:** Drag-and-drop status transitions (`TO DO`, `IN PROGRESS`, `IN REVIEW`, `DONE`) with checklist progress indicators.
-- **Automated Task Duration Calculation:** Moving a task to `DONE` automatically calculates elapsed work hours between `createdAt` and completion timestamp, persisting an automated ledger log to accurately track velocity.
-- **Task Learnings & Best Practices Knowledge Base:** Technical knowledge repository with multi-part file attachment support (PDF, DOCX, PNG, JPG) stored under `/uploads/learnings/`.
-- **Role-Based Access Control (RBAC):** Standard employees can view the company board, but can only edit/move tasks assigned to them. Admins & Managers retain full CRUD authority.
+- **Automated Task Duration Calculation:** Moving a task to `DONE` automatically calculates elapsed work hours between `createdAt` and completion timestamp.
+- **Task Learnings Knowledge Base:** Technical learnings repository with multi-part file attachment support (PDF, DOCX, PNG, JPG).
 
-### 🤖 3. Nvidia AI GenAI Copilot & Document Intelligence (`employee-service`)
+### 🤖 4. Nvidia AI GenAI Copilot & Document Intelligence (`employee-service`)
 - **Port:** `8082` | **Dedicated Database:** `emp_db`
 - **Multi-Model Resiliency Engine:** Automatic fallback across Nvidia AI models (`meta/llama-3.1-8b-instruct`, `meta/llama-3.1-70b-instruct`, `mistralai/mistral-7b-instruct-v0.2`, `google/gemma-2-27b-it`).
-- **Voice Assistant (STT & TTS):** Integrated Web Speech API (`SpeechRecognition` & `SpeechSynthesis`) for real-time hands-free voice interaction.
-- **Automated Performance Appraisals:** One-click AI evaluation generator based on employee performance data.
-- **Document Analysis Engine:** PDF/CSV document parsing for instant AI policy summaries.
+- **Voice Assistant (STT & TTS):** Integrated Web Speech API (`SpeechRecognition` & `SpeechSynthesis`) for hands-free voice interaction.
+- **Document Analysis Engine:** PDF/CSV document parsing for instant policy summaries.
 
-### 👥 4. Workforce Directory, Attendance Clock & Audit Ledger
+### 👥 5. Workforce Directory, Attendance Clock & Audit Ledger
 - **Live Attendance Clock:** Interactive 🟢 Clock In / 🔴 Clock Out widget with IP and geo-location tracking.
-- **Monthly Attendance Grid:** Calendar view with daily working hours, WFH, overtime tracking, and status badges.
 - **Admin Override & Audit Trail:** Secure override modal for attendance corrections with mandatory audit justification notes.
-- **WhatsApp-Style Profile Photo Lightbox:** Avatar lightbox modal with high-res file upload preview.
-
-### 💵 5. Payroll Management Engine
-- **Itemized Payroll Calculation:** Base salary breakdown, itemized 10% tax/PF deductions, and net payable salary.
-- **Payslip Generator:** Instant text payslip file generator (`Payslip_August2026.txt`).
-- **Batch Processing:** One-click batch payroll execution.
+- **Profile Photo Lightbox:** Avatar lightbox modal with high-res 10MB file upload support.
 
 ---
 
@@ -105,14 +109,13 @@ Every microservice operates on its dedicated relational database to guarantee do
 | Layer | Technology | Rationale |
 | :--- | :--- | :--- |
 | **Architecture** | Spring Cloud Microservices | Decentralized, domain-driven microservices for scalable organizational growth |
-| **Service Discovery** | Netflix Eureka (`service-registry`) | Dynamic service registry enabling zero-downtime microservice registration |
-| **API Gateway** | Spring Cloud Gateway (`api-gateway`) | Centralized ingress routing, CORS deduplication, and request predicates |
+| **Service Discovery** | Netflix Eureka (`service-registry`) | Dynamic service discovery enabling zero-downtime microservice registration |
+| **API Gateway** | Spring Cloud Gateway (`api-gateway`) | Centralized ingress routing, CORS deduplication, and 20MB request buffer |
 | **Backend Framework** | Java 17, Spring Boot 3.3.x, Spring Data JPA | Industrial performance, strong typing, and enterprise JPA abstractions |
-| **Database Systems** | PostgreSQL 15+ (H2 Fallback Profiles) | Production relational persistence with JSONB and transaction safety |
-| **Security** | Spring Security 6 & JJWT 0.12.5 | Stateless JWT authentication and role-based route protection |
-| **AI Copilot** | Nvidia GenAI API (`integrate.api.nvidia.com`) | State-of-the-art LLM reasoning with automated fallback models |
-| **Frontend Framework** | Angular 19 (Standalone Components) | Type-safe, modular SPA architecture with RxJS reactive state streams |
-| **Navigation Style** | Amazon-Style Sliding Submenus | Two-panel navigation with smooth CSS transitions and `← MAIN MENU` header |
+| **Database Systems** | PostgreSQL 15+ (H2 Fallback Profiles) | Production relational persistence with unique constraint validation |
+| **Security** | Spring Security 6 & JJWT 0.12.5 | Stateless JWT authentication and role-based route protection (`ROLE_EMPLOYEE`) |
+| **Frontend Framework** | Angular 18 (Standalone Components) | Type-safe, modular SPA architecture with RxJS reactive state streams |
+| **Styling** | Vanilla CSS3 & Bootstrap 5 | Modern glassmorphism design system, CSS animations, and fluid responsiveness |
 
 ---
 
@@ -122,25 +125,27 @@ Every microservice operates on its dedicated relational database to guarantee do
 Nexus-360-Enterprise-Platform/
 ├── backend/
 │   ├── pom.xml                                 # Root Maven Multi-Module POM
-│   ├── common-library/                         # Shared DTOs (ApiResponse, UserPrincipal)
+│   ├── common-library/                         # Shared DTOs (ApiResponse, UserDto, EmployeeDto)
 │   ├── service-registry/                       # Eureka Server (Port 8761)
 │   ├── api-gateway/                            # Spring Cloud Gateway Ingress (Port 8080)
 │   ├── auth-service/                           # JWT Authentication Service (Port 8081)
 │   ├── employee-service/                       # Employees, Payroll, AI Copilot Service (Port 8082)
 │   ├── task-service/                           # Jira Tasks, Sprint Velocity Service (Port 8083)
-│   └── project-knowledge-service/              # Enterprise Project Hub Service (Port 8084)
+│   ├── project-knowledge-service/              # Enterprise Project Hub Service (Port 8084)
+│   └── notification-service/                   # Real-Time Event Notification Hub (Port 8085)
 └── frontend/
     ├── src/app/
     │   ├── components/
     │   │   ├── ai-copilot/                     # Nvidia GenAI Voice & Text Copilot
-    │   │   ├── auth/                           # Login & Register Screens
-    │   │   ├── dashboard/                      # Dashboard Container
+    │   │   ├── auth/                           # Split-Screen Login & Register Pages
+    │   │   ├── dashboard/                      # Main Dashboard Container
     │   │   ├── dashboard-overview/             # Executive Overview Widgets
     │   │   ├── employee-list/                  # Employee Directory & Profile Lightbox
+    │   │   ├── notification-center/            # Notification Center Hub & Top Bell Widget
     │   │   ├── payroll/                        # Payroll Engine & Payslip Generator
-    │   │   ├── project-knowledge/              # Projects Directory, 360 Inspector & Wizard
-    │   │   ├── sidebar/                        # Amazon-Style Sliding Navigation
-    │   │   ├── task-board/                     # Jira Kanban, Backlog, Time Logs & Learnings
+    │   │   ├── project-knowledge/              # Projects Directory & 360° Inspector
+    │   │   ├── sidebar/                        # Sliding Submenu Navigation
+    │   │   ├── task-board/                     # Jira Kanban, Sprint KPIs & Learnings
     │   │   └── time-tools/                     # Attendance Clock & Audit Ledger
     │   ├── services/                           # Reactive HTTP API Services
     │   └── app.routes.ts                       # Lazy-Loaded Route Mappings
@@ -153,7 +158,7 @@ Nexus-360-Enterprise-Platform/
 ### Prerequisites
 1. **Java 17 JDK** installed and configured in `PATH`.
 2. **Node.js (v18+)** & `npm` / `npx`.
-3. **PostgreSQL Database** running on `localhost:5432` with databases created: `auth_db`, `emp_db`, `task_db`, `project_knowledge_db` *(Or use fallback H2 embedded profile)*.
+3. **PostgreSQL Database** running on `localhost:5432` with databases: `auth_db`, `emp_db`, `task_db`, `project_knowledge_db`, `notification_db`.
 
 ---
 
@@ -186,19 +191,28 @@ mvnw.cmd compile
    cd backend/auth-service
    ..\mvnw.cmd spring-boot:run
    ```
+
 4. **Employee Service**:
    ```bash
    cd backend/employee-service
    ..\mvnw.cmd spring-boot:run
    ```
+
 5. **Task Service**:
    ```bash
    cd backend/task-service
    ..\mvnw.cmd spring-boot:run
    ```
+
 6. **Project Knowledge Service**:
    ```bash
    cd backend/project-knowledge-service
+   ..\mvnw.cmd spring-boot:run
+   ```
+
+7. **Notification Service**:
+   ```bash
+   cd backend/notification-service
    ..\mvnw.cmd spring-boot:run
    ```
 
@@ -214,11 +228,8 @@ npm start
 
 ## 🔑 Default Credentials
 
-The platform auto-seeds initial administrator access on startup:
-
-- **Role:** Administrator (`ROLE_ADMIN`)
-- **Username:** `admin`
-- **Password:** `Admin@123`
+- **Administrator Access:** Username: `admin` | Password: `Admin@123`
+- **Employee Access:** Register any email pre-existing in `employee-service` (e.g., `ramanms8688@gmail.com`).
 
 ---
 
@@ -227,16 +238,22 @@ The platform auto-seeds initial administrator access on startup:
 | Method | Ingress Route Path | Microservice Target | Purpose |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/auth/login` | `AUTH-SERVICE` | User authentication & JWT issuance |
+| `POST` | `/auth/register` | `AUTH-SERVICE` | Register account with employee email pre-check |
 | `GET` | `/employee/findAll` | `EMPLOYEE-SERVICE` | Fetch employee directory |
-| `POST` | `/api/ai/chat` | `EMPLOYEE-SERVICE` | Nvidia GenAI Copilot stream |
-| `GET` | `/api/tasks` | `TASK-SERVICE` | Fetch tasks & backlog |
-| `POST` | `/api/tasks/learnings/upload` | `TASK-SERVICE` | Upload task learning attachment |
+| `GET` | `/employee/verify-email` | `EMPLOYEE-SERVICE` | Public employee email existence check |
+| `POST` | `/employee/save` | `EMPLOYEE-SERVICE` | Save employee with unique constraint validation |
+| `POST` | `/employee/upload-image` | `EMPLOYEE-SERVICE` | 10MB multipart profile photo upload |
+| `GET` | `/api/tasks` | `TASK-SERVICE` | Fetch Jira tasks & backlog |
+| `POST` | `/api/tasks` | `TASK-SERVICE` | Create task & dispatch event notification |
 | `GET` | `/api/projects` | `PROJECT-KNOWLEDGE-SERVICE` | Fetch enterprise projects directory |
-| `GET` | `/api/projects/{id}` | `PROJECT-KNOWLEDGE-SERVICE` | Fetch Project 360° Inspector details |
-| `POST` | `/api/projects/{id}/documents/upload` | `PROJECT-KNOWLEDGE-SERVICE` | Upload architecture blueprint document |
+| `GET` | `/api/notifications/user/{id}` | `NOTIFICATION-SERVICE` | Fetch user notifications & unread count |
+| `POST` | `/api/notifications/dispatch` | `NOTIFICATION-SERVICE` | Asynchronous event notification dispatcher |
 
 ---
 
-## 📄 License & Organization
+## 👨‍💻 Developer & Platform Architect
 
-**Nexus 360 Enterprise Platform** is built for high-performance enterprise operations, architectural inspection, and cloud-native microservices engineering.
+- **Platform Architect:** Ramanjaneyulu Boya
+- **Interactive Portfolio:** [`https://raman-8688.github.io/portfolio-projects/`](https://raman-8688.github.io/portfolio-projects/)
+- **GitHub Repository:** [`https://github.com/Raman-8688`](https://github.com/Raman-8688)
+- **LinkedIn Profile:** [Ramanjaneyulu Boya on LinkedIn](https://www.linkedin.com)
