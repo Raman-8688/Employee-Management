@@ -23,6 +23,12 @@ export class LoginComponent implements OnInit {
   submitted = false;
   returnUrl: string = '/dashboard';
   errorMessage: string = '';
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
 
   constructor(
     private formBuilder: FormBuilder,

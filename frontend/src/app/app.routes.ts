@@ -42,55 +42,55 @@ export const routes: Routes = [
         path: 'home',
         component: DashboardOverviewComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'people',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'payroll',
         component: PayrollComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'time-tools',
         component: TimeToolsComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'bonified',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'performance',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'personal',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'job',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'document',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'ai-copilot',
@@ -99,7 +99,7 @@ export const routes: Routes = [
             (m) => m.AiCopilotComponent
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'tasks',
@@ -108,7 +108,7 @@ export const routes: Routes = [
             (m) => m.TaskBoardComponent
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'learnings',
@@ -117,7 +117,7 @@ export const routes: Routes = [
             (m) => m.TaskBoardComponent
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'projects',
@@ -126,7 +126,7 @@ export const routes: Routes = [
             (m) => m.ProjectKnowledgeComponent
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
       {
         path: 'notifications',
@@ -135,8 +135,9 @@ export const routes: Routes = [
             (m) => m.NotificationCenterComponent
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER'] },
       },
+
 
 
 
