@@ -46,6 +46,12 @@ spring:
           predicates:
             - Path=/api/projects/**, /project-docs/**
 
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+
+
 
 eureka:
   instance:
