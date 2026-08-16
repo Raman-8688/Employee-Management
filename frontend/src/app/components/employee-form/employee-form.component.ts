@@ -2,8 +2,8 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
+import { NotificationService } from '../../services/notification.service';
 import { Employee } from '../../models/employee';
-
 
 import { MatIconModule } from '@angular/material/icon';
 
@@ -31,10 +31,15 @@ export class EmployeeFormComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   isUploading = false;
+  validationErrorMessage: string | null = null;
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(
+    private employeeService: EmployeeService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit() {
+    this.validationErrorMessage = null;
     if (this.employee) {
       this.formData = {
         name: this.employee.name || '',
@@ -54,6 +59,11 @@ export class EmployeeFormComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        this.validationErrorMessage = 'Selected profile image exceeds maximum allowed limit of 10MB.';
+        return;
+      }
+      this.validationErrorMessage = null;
       this.selectedFile = file;
       const reader = new FileReader();
       reader.onload = () => {
@@ -65,6 +75,7 @@ export class EmployeeFormComponent implements OnInit {
 
   save() {
     this.isUploading = true;
+    this.validationErrorMessage = null;
 
     if (this.selectedFile) {
       // Upload image first
@@ -86,8 +97,8 @@ export class EmployeeFormComponent implements OnInit {
         error: (err) => {
           console.error('Image upload failed:', err);
           this.isUploading = false;
-          alert('Failed to upload image. Saving employee without new image.');
-          this.submitEmployeeData();
+          const msg = err.error?.message || 'Failed to upload profile image. File might exceed 10MB limit.';
+          this.validationErrorMessage = msg;
         }
       });
     } else {
@@ -111,11 +122,13 @@ export class EmployeeFormComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isUploading = false;
+            this.notificationService.getUnreadCount(1).subscribe({ error: () => {} });
             this.close.emit();
           },
           error: (err) => {
             this.isUploading = false;
             console.error('Update error:', err);
+            this.validationErrorMessage = err.error?.message || err.error?.data || 'Failed to update employee details.';
           }
         });
     } else {
@@ -123,13 +136,17 @@ export class EmployeeFormComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isUploading = false;
+            this.notificationService.getUnreadCount(1).subscribe({ error: () => {} });
             this.close.emit();
           },
           error: (err) => {
             this.isUploading = false;
             console.error('Save error:', err);
+            this.validationErrorMessage = err.error?.message || err.error?.data || 'An employee with this email address already exists. Please use a unique email address.';
           }
         });
     }
   }
+
+
 }

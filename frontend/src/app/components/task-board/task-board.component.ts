@@ -8,6 +8,7 @@ import { EmployeeService } from '../../services/employee.service';
 import { AuthService } from '../../services/auth.service';
 import { Employee } from '../../models/employee';
 import { ConfirmDialogService } from '../../shared/services/confirm-dialog.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-task-board',
@@ -91,6 +92,7 @@ export class TaskBoardComponent implements OnInit {
     private employeeService: EmployeeService,
     private authService: AuthService,
     private confirmDialogService: ConfirmDialogService,
+    private notificationService: NotificationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}

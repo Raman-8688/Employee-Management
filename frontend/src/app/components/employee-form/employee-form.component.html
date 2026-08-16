@@ -81,7 +81,15 @@
             step="1000"
             required />
         </div>
+
+        <!-- Validation Error Alert Banner -->
+        <div *ngIf="validationErrorMessage" class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-0" role="alert">
+
+          <mat-icon style="font-size: 20px; width: 20px; height: 20px;">error</mat-icon>
+          <div class="small fw-semibold">{{ validationErrorMessage }}</div>
+        </div>
       </div>
+
 
       <!-- Modal Footer -->
       <div class="modal-footer bg-light border-0 py-3 px-4">
