@@ -93,7 +93,11 @@
             >Please enter a valid email</span
           >
         </div>
+        <small class="helper-text" style="font-size: 11.5px; color: #64748b; margin-top: 4px; display: block;">
+          ℹ️ Your email address must already be registered in the Employee Directory by HR.
+        </small>
       </div>
+
 
       <div class="form-row">
         <div class="form-group">
@@ -149,8 +153,9 @@
       </button>
 
       <div class="login-link">
-        Already have an account? <a routerLink="/login">Sign In</a>
+        Already have an account? <a routerLink="/login" (click)="goToLogin($event)">Sign In</a>
       </div>
+
     </form>
   </div>
 </div>

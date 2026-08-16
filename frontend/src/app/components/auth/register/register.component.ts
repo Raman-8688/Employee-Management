@@ -6,14 +6,14 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, RouterModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
@@ -43,6 +43,12 @@ export class RegisterComponent {
     );
   }
 
+  goToLogin(event?: Event): void {
+    if (event) event.preventDefault();
+    this.router.navigate(['/login']);
+  }
+
+
   passwordMatchValidator(g: FormGroup) {
     return g.get('password')?.value === g.get('confirmPassword')?.value
       ? null
@@ -71,15 +77,17 @@ export class RegisterComponent {
     const { confirmPassword, ...registerData } = this.registerForm.value;
 
     this.authService.register(registerData).subscribe({
-      next: () => {
-        alert('Registration successful! Welcome!');
-        this.router.navigate(['/dashboard']);
+      next: (res: any) => {
+        const msg = res?.message || 'Registration successful! Your account has been created. Please sign in.';
+        alert(msg);
+        this.router.navigate(['/login']);
       },
       error: (error) => {
-        this.errorMessage =
-          error.message || 'Registration failed. Please try again.';
         this.isLoading = false;
+        const serverMsg = error.error?.message || error.error?.data || error.message || 'Registration failed. Please verify your email and details.';
+        this.errorMessage = serverMsg;
       },
     });
   }
 }
+

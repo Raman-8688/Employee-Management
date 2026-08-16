@@ -6,14 +6,14 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
@@ -30,6 +30,12 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
   ) {}
+
+  goToRegister(event?: Event): void {
+    if (event) event.preventDefault();
+    this.router.navigate(['/register']);
+  }
+
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({

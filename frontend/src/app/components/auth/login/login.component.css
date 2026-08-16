@@ -193,11 +193,18 @@
 }
 
 .register-link a {
-  color: #667eea;
+  color: #4f46e5;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .register-link a:hover {
+  color: #3730a3;
+  background-color: rgba(79, 70, 229, 0.08);
   text-decoration: underline;
 }
+

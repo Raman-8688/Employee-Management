@@ -58,8 +58,9 @@
       </button>
 
       <div class="register-link">
-        Don't have an account? <a routerLink="/register">Create an account</a>
+        Don't have an account? <a routerLink="/register" (click)="goToRegister($event)">Create an account</a>
       </div>
+
     </form>
   </div>
 </div>
