@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+
 
 import com.employee.employeeservice.client.NotificationEventDispatcher;
 
@@ -37,8 +40,16 @@ public class EmployeeService {
         if (employee.getEmail() != null && employeeRepository.existsByEmail(employee.getEmail().trim())) {
             throw new IllegalArgumentException("An employee with this email address ('" + employee.getEmail() + "') already exists. Please use a unique email address.");
         }
-        if (employee.getStatus() == null) {
-            employee.setStatus("Active");
+        if (employee.getStatus() == null || employee.getStatus().trim().isEmpty()) {
+            employee.setStatus("ACTIVE");
+        }
+        if (employee.getJoiningDate() == null) {
+            employee.setJoiningDate(java.time.LocalDate.now());
+        }
+        if (employee.getRoles() == null || employee.getRoles().isEmpty()) {
+            java.util.Set<String> defaultRoles = new java.util.HashSet<>();
+            defaultRoles.add("ROLE_EMPLOYEE");
+            employee.setRoles(defaultRoles);
         }
         Employee saved = employeeRepository.save(employee);
         notificationEventDispatcher.dispatchEmployeeOnboardedNotification(saved);
@@ -58,6 +69,10 @@ public class EmployeeService {
         if (updated.getSal() != null) emp.setSal(updated.getSal());
         if (updated.getProfileImageUrl() != null) emp.setProfileImageUrl(updated.getProfileImageUrl());
         if (updated.getStatus() != null) emp.setStatus(updated.getStatus());
+        if (updated.getJoiningDate() != null) emp.setJoiningDate(updated.getJoiningDate());
+        if (updated.getTechStackSummary() != null) emp.setTechStackSummary(updated.getTechStackSummary());
+        if (updated.getRoles() != null && !updated.getRoles().isEmpty()) emp.setRoles(updated.getRoles());
+
         Employee saved = employeeRepository.save(emp);
         notificationEventDispatcher.dispatchEmployeeUpdatedNotification(saved);
         return saved;
@@ -65,8 +80,35 @@ public class EmployeeService {
 
 
 
+
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    public Map<String, Object> getEmployeeAnalytics() {
+        List<Employee> all = employeeRepository.findAll();
+        long total = all.size();
+        long active = all.stream().filter(e -> e.getStatus() == null || !"Inactive".equalsIgnoreCase(e.getStatus())).count();
+        long onboarding = all.stream().filter(e -> "Onboarding".equalsIgnoreCase(e.getStatus())).count();
+        long offboarding = all.stream().filter(e -> "Offboarding".equalsIgnoreCase(e.getStatus()) || "Inactive".equalsIgnoreCase(e.getStatus())).count();
+
+        double monthlyBurnRate = all.stream()
+                .filter(e -> e.getSal() != null)
+                .mapToDouble(Employee::getSal)
+                .sum();
+
+        java.util.Map<String, Long> deptCounts = all.stream()
+                .filter(e -> e.getDepartment() != null && !e.getDepartment().trim().isEmpty())
+                .collect(Collectors.groupingBy(Employee::getDepartment, Collectors.counting()));
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("totalEmployees", total);
+        response.put("activeEmployees", active);
+        response.put("onboardingEmployees", onboarding);
+        response.put("offboardingEmployees", offboarding);
+        response.put("monthlyPayrollBurnRate", monthlyBurnRate);
+        response.put("departmentBreakdown", deptCounts);
+        return response;
     }
 
     public EmployeeDto getEmployeeDtoById(Long id) {
@@ -79,6 +121,10 @@ public class EmployeeService {
                 .sal(emp.getSal())
                 .profileImageUrl(emp.getProfileImageUrl())
                 .status(emp.getStatus())
+                .joiningDate(emp.getJoiningDate())
+                .techStackSummary(emp.getTechStackSummary())
+                .roles(emp.getRoles())
                 .build();
     }
+
 }

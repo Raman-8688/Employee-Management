@@ -29,6 +29,13 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse<>("User notifications fetched successfully", list));
     }
 
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse<List<Notification>>> getRecentActivityStream() {
+        List<Notification> stream = notificationService.getRecentActivityStream();
+        return ResponseEntity.ok(new ApiResponse<>("Recent activity stream fetched successfully", stream));
+    }
+
+
     @GetMapping("/user/{userId}/unread-count")
     public ResponseEntity<ApiResponse<Long>> getUnreadCount(@PathVariable("userId") Long userId) {
         Long count = notificationService.getUnreadCount(userId);

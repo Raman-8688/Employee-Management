@@ -16,5 +16,9 @@ public class EmployeeDto {
     private String department;
     private Double sal;
     private String profileImageUrl;
-    private String status; // Active, Onboarding, Offboarding
+    private String status; // ACTIVE, ONBOARDING, OFFBOARDING, TERMINATED
+    private java.time.LocalDate joiningDate;
+    private String techStackSummary;
+    private java.util.Set<String> roles;
 }
+

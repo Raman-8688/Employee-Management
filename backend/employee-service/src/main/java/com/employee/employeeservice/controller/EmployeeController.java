@@ -43,6 +43,13 @@ public class EmployeeController {
         return ResponseEntity.ok(new ApiResponse<>("Email verification result", exists));
     }
 
+    @GetMapping("/analytics")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getEmployeeAnalytics() {
+        return ResponseEntity.ok(new ApiResponse<>("Employee analytics fetched", employeeService.getEmployeeAnalytics()));
+    }
+
+
     @GetMapping("/{id}")
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")

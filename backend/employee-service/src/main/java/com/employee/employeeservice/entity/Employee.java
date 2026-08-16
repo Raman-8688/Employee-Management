@@ -27,5 +27,15 @@ public class Employee {
     private String department;
     private Double sal;
     private String profileImageUrl;
-    private String status; // Active, Onboarding, Offboarding
+    private String status; // ACTIVE, ONBOARDING, OFFBOARDING, TERMINATED
+
+    private java.time.LocalDate joiningDate;
+    private String techStackSummary;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "employee_roles", joinColumns = @JoinColumn(name = "employee_id"))
+    @Column(name = "role")
+    @Builder.Default
+    private java.util.Set<String> roles = new java.util.HashSet<>();
 }
+

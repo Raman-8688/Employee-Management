@@ -98,6 +98,11 @@ public class NotificationService {
         return notificationRepository.searchUserNotifications(userId, cat, unreadOnly);
     }
 
+    public List<Notification> getRecentActivityStream() {
+        return notificationRepository.findTop10ByOrderByCreatedAtDesc();
+    }
+
+
     public Long getUnreadCount(Long userId) {
         return notificationRepository.countByRecipientIdAndReadStatusFalse(userId);
     }
