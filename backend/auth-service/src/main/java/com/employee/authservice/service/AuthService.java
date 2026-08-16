@@ -169,13 +169,45 @@ public class AuthService {
 
     @Transactional
     public ApiResponse<UserDto> register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Error: Username is already taken!");
+        String username = request.getUsername() != null ? request.getUsername().trim() : "";
+        String email = request.getEmail() != null ? request.getEmail().trim() : "";
+
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username '" + username + "' is already taken! Please choose another.");
         }
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Error: Email is already in use!");
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("An account with email '" + email + "' already exists! Please sign in.");
         }
+
+        // Enterprise Validation: Ensure email is pre-registered in employee-service
+        boolean employeeExists = false;
+        try {
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            String verifyUrl = "http://localhost:8082/employee/verify-email?email=" + email;
+            try {
+                ApiResponse response = restTemplate.getForObject(verifyUrl, ApiResponse.class);
+                if (response != null && Boolean.TRUE.equals(response.getData())) {
+                    employeeExists = true;
+                }
+            } catch (Exception ex) {
+                // Fallback to Gateway URL
+                String gatewayUrl = "http://localhost:8080/employee/verify-email?email=" + email;
+                ApiResponse response = restTemplate.getForObject(gatewayUrl, ApiResponse.class);
+                if (response != null && Boolean.TRUE.equals(response.getData())) {
+                    employeeExists = true;
+                }
+            }
+        } catch (Exception ex) {
+            log.warn("Could not query employee-service for email check: {}", ex.getMessage());
+            // If employee service is unreachable, permit admin/hr fallback
+            employeeExists = true;
+        }
+
+        if (!employeeExists) {
+            throw new IllegalArgumentException("Registration Rejected: Your email address ('" + email + "') is not registered in the Employee Directory. Only verified employees may create an account. Please contact HR to be onboarded first.");
+        }
+
 
         Set<Role> roles = new HashSet<>();
         if (request.getRoles() == null || request.getRoles().isEmpty()) {

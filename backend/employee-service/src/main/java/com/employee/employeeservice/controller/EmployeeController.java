@@ -37,7 +37,14 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.findAllEmployees());
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Boolean>> verifyEmailExists(@RequestParam("email") String email) {
+        boolean exists = employeeService.existsByEmail(email);
+        return ResponseEntity.ok(new ApiResponse<>("Email verification result", exists));
+    }
+
     @GetMapping("/{id}")
+
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(employeeService.findById(id));

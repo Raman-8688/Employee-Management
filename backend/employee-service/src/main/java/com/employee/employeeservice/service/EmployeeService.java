@@ -22,7 +22,13 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
+    public boolean existsByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) return false;
+        return employeeRepository.existsByEmail(email.trim());
+    }
+
     public Employee findById(Long id) {
+
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
     }
