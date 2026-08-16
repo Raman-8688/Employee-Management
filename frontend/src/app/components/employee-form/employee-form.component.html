@@ -70,17 +70,65 @@
           </select>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold text-secondary small">Salary *</label>
-          <input 
-            type="number" 
-            [(ngModel)]="formData.sal" 
-            class="form-control" 
-            placeholder="Enter salary"
-            min="0"
-            step="1000"
-            required />
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-secondary small">Salary ($) *</label>
+            <input 
+              type="number" 
+              [(ngModel)]="formData.sal" 
+              class="form-control" 
+              placeholder="Enter salary"
+              min="0"
+              step="1000"
+              required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-secondary small">Official Joining Date *</label>
+            <input 
+              type="date" 
+              [(ngModel)]="formData.joiningDate" 
+              class="form-control" 
+              required />
+          </div>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-secondary small">Lifecycle Status *</label>
+          <select [(ngModel)]="formData.status" class="form-select" required>
+            <option value="ACTIVE">ACTIVE (Current Staff)</option>
+            <option value="ONBOARDING">ONBOARDING (New Recruit Pipeline)</option>
+            <option value="OFFBOARDING">OFFBOARDING (Exiting Process)</option>
+            <option value="TERMINATED">TERMINATED (Exited Staff)</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-secondary small">Tech Stack Summary / Primary Skills</label>
+          <input 
+            type="text" 
+            [(ngModel)]="formData.techStackSummary" 
+            class="form-control" 
+            placeholder="e.g. Java, Spring Boot, Angular, PostgreSQL" />
+        </div>
+
+        <!-- Role Assignment Checks -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-secondary small">Assigned System Roles *</label>
+          <div class="d-flex flex-wrap gap-2 pt-1">
+            <div *ngFor="let role of availableRoles" class="form-check me-2">
+              <input 
+                type="checkbox" 
+                class="form-check-input cursor-pointer" 
+                [id]="'role_' + role.value"
+                [checked]="isRoleSelected(role.value)"
+                (change)="toggleRole(role.value)" />
+              <label class="form-check-label small cursor-pointer" [for]="'role_' + role.value">
+                {{ role.label }}
+              </label>
+            </div>
+          </div>
+        </div>
+
 
         <!-- Validation Error Alert Banner -->
         <div *ngIf="validationErrorMessage" class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-0" role="alert">

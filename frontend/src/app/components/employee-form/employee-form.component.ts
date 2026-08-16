@@ -21,12 +21,37 @@ export class EmployeeFormComponent implements OnInit {
   formData: Employee = {
     name: '',
     email: '',
-    department: '',
-    sal: 0,
-    employmentType: 'Employment',
-    joinDate: new Date().toISOString().split('T')[0],
+    department: 'Engineering',
+    sal: 65000,
+    employmentType: 'Full-Time',
+    joiningDate: new Date().toISOString().split('T')[0],
+    status: 'ACTIVE',
+    techStackSummary: 'Java, Spring Boot, Angular, PostgreSQL',
     profileImageUrl: ''
   };
+
+  availableRoles = [
+    { label: 'Standard Employee', value: 'ROLE_EMPLOYEE' },
+    { label: 'HR Manager', value: 'ROLE_HR' },
+    { label: 'Engineering Manager', value: 'ROLE_MANAGER' },
+    { label: 'System Admin', value: 'ROLE_ADMIN' }
+  ];
+
+  selectedRoles: string[] = ['ROLE_EMPLOYEE'];
+
+  toggleRole(roleValue: string) {
+    if (this.selectedRoles.includes(roleValue)) {
+      if (this.selectedRoles.length > 1) {
+        this.selectedRoles = this.selectedRoles.filter(r => r !== roleValue);
+      }
+    } else {
+      this.selectedRoles.push(roleValue);
+    }
+  }
+
+  isRoleSelected(roleValue: string): boolean {
+    return this.selectedRoles.includes(roleValue);
+  }
 
   selectedFile: File | null = null;
   imagePreview: string | null = null;
@@ -44,17 +69,23 @@ export class EmployeeFormComponent implements OnInit {
       this.formData = {
         name: this.employee.name || '',
         email: this.employee.email || '',
-        department: this.employee.department || '',
+        department: this.employee.department || 'Engineering',
         sal: this.employee.sal || 0,
-        employmentType: this.employee.employmentType || 'Employment',
-        joinDate: this.employee.joinDate || new Date().toISOString().split('T')[0],
+        employmentType: this.employee.employmentType || 'Full-Time',
+        joiningDate: this.employee.joiningDate || this.employee.joinDate || new Date().toISOString().split('T')[0],
+        status: this.employee.status || 'ACTIVE',
+        techStackSummary: this.employee.techStackSummary || 'Java, Spring Boot, Angular',
         profileImageUrl: this.employee.profileImageUrl || ''
       };
+      if (this.employee.roles && this.employee.roles.length > 0) {
+        this.selectedRoles = [...this.employee.roles];
+      }
       if (this.employee.profileImageUrl) {
         this.imagePreview = this.employee.profileImageUrl;
       }
     }
   }
+
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -113,7 +144,10 @@ export class EmployeeFormComponent implements OnInit {
       department: this.formData.department,
       sal: Number(this.formData.sal),
       employmentType: this.formData.employmentType,
-      joinDate: this.formData.joinDate,
+      joiningDate: this.formData.joiningDate,
+      status: this.formData.status,
+      techStackSummary: this.formData.techStackSummary,
+      roles: this.selectedRoles,
       profileImageUrl: this.formData.profileImageUrl
     };
 
@@ -147,6 +181,7 @@ export class EmployeeFormComponent implements OnInit {
         });
     }
   }
+
 
 
 }

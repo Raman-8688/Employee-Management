@@ -24,5 +24,10 @@ export interface Employee {
   sal: number;
   employmentType?: string;
   joinDate?: string;
+  joiningDate?: string;
   profileImageUrl?: string;
+  status?: 'ACTIVE' | 'ONBOARDING' | 'OFFBOARDING' | 'TERMINATED' | string;
+  techStackSummary?: string;
+  roles?: string[];
 }
+

@@ -6,27 +6,27 @@
         <button
           class="nav-link fw-semibold px-4"
           [class.active]="activeTab === 'active'"
-          (click)="activeTab = 'active'"
+          (click)="setTab('active')"
         >
-          Active <span class="badge bg-secondary rounded-pill ms-1">{{ employees.length }}</span>
+          Active Staff <span class="badge bg-primary rounded-pill ms-1">{{ activeCount }}</span>
         </button>
       </li>
       <li class="nav-item">
         <button
           class="nav-link fw-semibold px-4"
           [class.active]="activeTab === 'onboarding'"
-          (click)="activeTab = 'onboarding'"
+          (click)="setTab('onboarding')"
         >
-          Onboarding <span class="badge bg-light text-dark rounded-pill ms-1">0</span>
+          Onboarding Pipeline <span class="badge bg-warning text-dark rounded-pill ms-1">{{ onboardingCount }}</span>
         </button>
       </li>
       <li class="nav-item">
         <button
           class="nav-link fw-semibold px-4"
           [class.active]="activeTab === 'offboarding'"
-          (click)="activeTab = 'offboarding'"
+          (click)="setTab('offboarding')"
         >
-          Offboarding <span class="badge bg-light text-dark rounded-pill ms-1">0</span>
+          Offboarding / Exited <span class="badge bg-danger rounded-pill ms-1">{{ offboardingCount }}</span>
         </button>
       </li>
     </ul>
@@ -43,7 +43,7 @@
           type="text"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
-          placeholder="Search employees..."
+          placeholder="Search by name, email, department, tech stack..."
           class="form-control border-start-0 ps-0"
         />
       </div>
@@ -107,14 +107,14 @@
         <thead class="table-light">
           <tr>
             <th (click)="sort('name')" class="user-select-none cursor-pointer py-3 px-4" [class.text-primary]="sortBy === 'name'">
-              Name <mat-icon class="align-middle fs-6">{{ getSortIcon("name") }}</mat-icon>
-            </th>
-            <th (click)="sort('email')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'email'">
-              Email <mat-icon class="align-middle fs-6">{{ getSortIcon("email") }}</mat-icon>
+              Employee <mat-icon class="align-middle fs-6">{{ getSortIcon("name") }}</mat-icon>
             </th>
             <th (click)="sort('department')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'department'">
-              Department <mat-icon class="align-middle fs-6">{{ getSortIcon("department") }}</mat-icon>
+              Dept & Tech Stack <mat-icon class="align-middle fs-6">{{ getSortIcon("department") }}</mat-icon>
             </th>
+            <th>Assigned Roles</th>
+            <th>Joining Date</th>
+            <th>Status</th>
             <th (click)="sort('sal')" class="user-select-none cursor-pointer py-3" [class.text-primary]="sortBy === 'sal'">
               Salary <mat-icon class="align-middle fs-6">{{ getSortIcon("sal") }}</mat-icon>
             </th>
@@ -129,12 +129,35 @@
                   <img *ngIf="emp.profileImageUrl" [src]="emp.profileImageUrl" [alt]="emp.name" />
                   <span *ngIf="!emp.profileImageUrl" class="fw-bold">{{ emp.name ? emp.name.charAt(0).toUpperCase() : '?' }}</span>
                 </div>
-                <span class="fw-semibold text-dark">{{ emp.name }}</span>
+                <div>
+                  <div class="fw-semibold text-dark">{{ emp.name }}</div>
+                  <small class="text-muted" style="font-size: 11px;">{{ emp.email }}</small>
+                </div>
               </div>
             </td>
-            <td class="text-secondary">{{ emp.email }}</td>
             <td>
-              <span class="badge badge-soft-primary">{{ emp.department }}</span>
+              <span class="badge bg-primary-subtle text-primary mb-1">{{ emp.department || 'Engineering' }}</span>
+              <div *ngIf="emp.techStackSummary" class="text-secondary small" style="font-size: 11px;">
+                ⚙️ {{ emp.techStackSummary }}
+              </div>
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                <span *ngFor="let r of emp.roles || ['ROLE_EMPLOYEE']" class="badge bg-dark-subtle text-dark" style="font-size: 10px;">
+                  {{ r.replace('ROLE_', '') }}
+                </span>
+              </div>
+            </td>
+            <td class="text-secondary small">
+              {{ emp.joiningDate || emp.joinDate || '2026-01-15' }}
+            </td>
+            <td>
+              <span class="badge" 
+                [class.bg-success-subtle]="!emp.status || emp.status === 'ACTIVE'" [class.text-success]="!emp.status || emp.status === 'ACTIVE'"
+                [class.bg-warning-subtle]="emp.status === 'ONBOARDING'" [class.text-warning]="emp.status === 'ONBOARDING'"
+                [class.bg-danger-subtle]="emp.status === 'OFFBOARDING' || emp.status === 'TERMINATED'" [class.text-danger]="emp.status === 'OFFBOARDING' || emp.status === 'TERMINATED'">
+                {{ emp.status || 'ACTIVE' }}
+              </span>
             </td>
             <td class="fw-semibold text-success">${{ emp.sal | number }}</td>
             <td class="text-end px-4">
@@ -161,6 +184,7 @@
               </button>
             </td>
           </tr>
+
 
           <!-- Empty State -->
           <tr *ngIf="displayedEmployees.length === 0">

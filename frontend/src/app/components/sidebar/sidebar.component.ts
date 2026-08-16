@@ -106,6 +106,30 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+  get filteredMenuItems(): MenuItem[] {
+    const isEmployeeOnly = !this.authService.hasAnyRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR']);
+    if (!isEmployeeOnly) {
+      return this.menuItems;
+    }
+    return this.menuItems
+      .filter(item => {
+        if (item.route === '/dashboard/payroll' || item.route === '/dashboard/bonified') {
+          return false;
+        }
+        return true;
+      })
+      .map(item => {
+        if (item.id === 'projects' && item.subItems) {
+          return {
+            ...item,
+            subItems: item.subItems.filter(sub => sub.queryParams?.view !== 'WIZARD')
+          };
+        }
+        return item;
+      });
+  }
+
+
   closeSubmenu(): void {
     this.activeCategory = null;
   }

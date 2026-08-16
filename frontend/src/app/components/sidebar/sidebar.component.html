@@ -69,7 +69,8 @@
       <!-- MAIN MENU PANEL -->
       <div class="menu-panel main-panel">
         <ul class="nav-list">
-          <li *ngFor="let item of menuItems" class="nav-item">
+          <li *ngFor="let item of filteredMenuItems" class="nav-item">
+
             <!-- Direct link item -->
             <a *ngIf="!item.subItems" [routerLink]="item.route" routerLinkActive="active" class="nav-link">
               <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>

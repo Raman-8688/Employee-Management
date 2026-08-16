@@ -1,226 +1,308 @@
-<div class="container-fluid p-4 dashboard-overview-container">
-  <!-- Top Welcome Banner -->
-  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-    <div>
-      <h3 class="fw-bold mb-1 text-dark">Enterprise Overview</h3>
-      <p class="text-secondary mb-0 small">Real-time metrics, headcount insights, and department distribution.</p>
+<div class="dashboard-overview-container">
+
+  <!-- TOP HEADER WELCOME BANNER -->
+  <div class="welcome-header-card">
+    <div class="header-left">
+      <div class="role-badge" [class.admin-badge]="isAdminOrManager" [class.emp-badge]="!isAdminOrManager">
+        <span class="pulse-dot"></span>
+        {{ isAdminOrManager ? 'Nexus Executive Command Center' : 'My Personal Workspace' }}
+      </div>
+      <h1 class="welcome-title">
+        Welcome back, <span>{{ currentUser?.firstName || currentUser?.username || 'Architect' }}</span> 👋
+      </h1>
+      <p class="welcome-lead">
+        {{ isAdminOrManager ? 'Real-time telemetry across 9 microservices, Jira sprint velocity, payroll burn rate, and workforce directory.' : 'Track your active Jira tasks, sprint velocity, attendance clock, and technical learnings.' }}
+      </p>
     </div>
-    <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-outline-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-1" (click)="fetchDashboardData()">
-        <mat-icon class="fs-6">refresh</mat-icon> Refresh Data
-      </button>
-      <a routerLink="/dashboard/people" class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-1 shadow-sm">
-        <mat-icon class="fs-6">person_add</mat-icon> Add Employee
+
+    <!-- QUICK ACTIONS TOOLBAR -->
+    <div class="quick-actions-toolbar">
+      <a *ngIf="isAdminOrManager" [routerLink]="['/dashboard/people']" class="quick-action-tile primary-tile">
+        <mat-icon>person_add</mat-icon>
+        <span>Add Employee</span>
+      </a>
+      <a [routerLink]="['/dashboard/tasks']" [queryParams]="{ view: 'KANBAN' }" class="quick-action-tile blue-tile">
+        <mat-icon>add_task</mat-icon>
+        <span>Create Task</span>
+      </a>
+      <a [routerLink]="['/dashboard/learnings']" class="quick-action-tile purple-tile">
+        <mat-icon>school</mat-icon>
+        <span>Add Learning</span>
+      </a>
+      <a [routerLink]="['/dashboard/projects']" class="quick-action-tile emerald-tile">
+        <mat-icon>business_center</mat-icon>
+        <span>Project Hub</span>
+      </a>
+      <a [routerLink]="['/dashboard/ai-copilot']" class="quick-action-tile pink-tile">
+        <mat-icon>smart_toy</mat-icon>
+        <span>AI Copilot</span>
       </a>
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-2 text-secondary fw-medium">Loading Dashboard Analytics...</p>
-  </div>
+  <!-- COMPACT TOP KPI OVERVIEW CARDS (DISPLAY SIDE-BY-SIDE) -->
+  <div class="compact-kpi-grid">
 
-  <!-- Main Content Dashboard View -->
-  <div *ngIf="!isLoading">
-    <!-- 1. TOP KPI SUMMARY CARDS GRID -->
-    <div class="row g-3 mb-4">
-      <!-- Card 1: Active Headcount -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-white hover-lift">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <span class="text-secondary fw-semibold small">Active Headcount</span>
-            <div class="p-2 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center">
-              <mat-icon>groups</mat-icon>
-            </div>
-          </div>
-          <h2 class="fw-bold text-dark mb-2">{{ totalHeadcount }}</h2>
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-success-subtle text-success fw-semibold font-monospace" style="font-size: 11px;">+8.2%</span>
-            <small class="text-muted" style="font-size: 12px;">vs previous month</small>
-          </div>
-        </div>
+    <!-- KPI 1: HEADCOUNT -->
+    <div class="compact-kpi-card">
+      <div class="compact-card-icon bg-blue">
+        <mat-icon>groups</mat-icon>
       </div>
-
-      <!-- Card 2: Onboarding -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-white hover-lift">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <span class="text-secondary fw-semibold small">Onboarding</span>
-            <div class="p-2 rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center">
-              <mat-icon>person_add</mat-icon>
-            </div>
-          </div>
-          <h2 class="fw-bold text-dark mb-2">{{ onboardingCount }}</h2>
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-info-subtle text-info fw-semibold font-monospace" style="font-size: 11px;">In Progress</span>
-            <small class="text-muted" style="font-size: 12px;">new recruits</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3: Offboarding -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-white hover-lift">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <span class="text-secondary fw-semibold small">Offboarding</span>
-            <div class="p-2 rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center">
-              <mat-icon>person_remove</mat-icon>
-            </div>
-          </div>
-          <h2 class="fw-bold text-dark mb-2">{{ offboardingCount }}</h2>
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-warning-subtle text-warning fw-semibold font-monospace" style="font-size: 11px;">1 Scheduled</span>
-            <small class="text-muted" style="font-size: 12px;">this quarter</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4: Total Monthly Payroll -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-white hover-lift">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <span class="text-secondary fw-semibold small">Monthly Payroll</span>
-            <div class="p-2 rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center">
-              <mat-icon>payments</mat-icon>
-            </div>
-          </div>
-          <h2 class="fw-bold text-dark mb-2">${{ totalMonthlyPayroll | number:'1.0-0' }}</h2>
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-primary-subtle text-primary fw-semibold font-monospace" style="font-size: 11px;">Live Budget</span>
-            <small class="text-muted" style="font-size: 12px;">calculated from DB</small>
-          </div>
+      <div class="compact-card-content">
+        <span class="compact-label">Active Headcount</span>
+        <div class="compact-value-row">
+          <span class="compact-value">{{ totalHeadcount }}</span>
+          <span class="compact-pill pill-emerald">🟢 Active: {{ activeHeadcount }}</span>
         </div>
       </div>
     </div>
 
-    <!-- 2. MAIN WIDGETS SECTION (2 COLUMNS) -->
-    <div class="row g-4">
-      <!-- Left Column: Department Distribution Breakdown -->
-      <div class="col-12 col-lg-7">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-          <div class="d-flex align-items-center justify-content-between mb-4">
-            <div>
-              <h5 class="fw-bold mb-1 text-dark">Department Distribution</h5>
-              <p class="text-secondary mb-0 small">Headcount and salary expenditure by team</p>
-            </div>
-            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill font-monospace" style="font-size: 11px;">
-              {{ departmentStats.length }} Departments
-            </span>
-          </div>
-
-          <!-- Department Rows -->
-          <div class="d-flex flex-column gap-4">
-            <div *ngFor="let dept of departmentStats" class="dept-stat-row">
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="badge rounded-circle p-1" [class]="dept.colorClass"></span>
-                  <span class="fw-semibold text-dark">{{ dept.name }}</span>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                  <small class="text-muted fw-medium">{{ dept.count }} employees</small>
-                  <span class="fw-bold text-dark" style="font-size: 13px;">${{ dept.totalSalary | number:'1.0-0' }}</span>
-                  <span class="badge bg-light text-primary border rounded-pill px-2 py-1 font-monospace" style="font-size: 11px;">
-                    {{ dept.percentage }}%
-                  </span>
-                </div>
-              </div>
-              <!-- Progress Bar -->
-              <div class="progress rounded-pill bg-light" style="height: 8px;">
-                <div 
-                  class="progress-bar rounded-pill" 
-                  [class]="dept.colorClass" 
-                  role="progressbar" 
-                  [style.width.%]="dept.percentage"
-                ></div>
-              </div>
-            </div>
-
-            <!-- Empty State for Departments -->
-            <div *ngIf="departmentStats.length === 0" class="text-center py-4 text-muted">
-              <mat-icon class="fs-1 text-secondary mb-1">domain_disabled</mat-icon>
-              <p class="mb-0">No department statistics available</p>
-            </div>
-          </div>
-        </div>
+    <!-- KPI 2: PAYROLL RUN-RATE / MY TASKS -->
+    <div class="compact-kpi-card" *ngIf="isAdminOrManager">
+      <div class="compact-card-icon bg-emerald">
+        <mat-icon>payments</mat-icon>
       </div>
-
-      <!-- Right Column: Quick Actions & Recent Activity Feed -->
-      <div class="col-12 col-lg-5 d-flex flex-column gap-4">
-        <!-- Quick Actions Card -->
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
-          <h5 class="fw-bold mb-3 text-dark">Quick Actions</h5>
-          <div class="row g-2">
-            <div class="col-4">
-              <a routerLink="/dashboard/tasks" class="btn btn-outline-warning w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
-                <mat-icon class="fs-4 text-warning">task_alt</mat-icon>
-                <span class="fw-semibold text-dark small">Task Board</span>
-                <small class="text-muted" style="font-size: 11px;">Jira Kanban board</small>
-              </a>
-            </div>
-            <div class="col-4">
-              <a routerLink="/dashboard/time-tools" class="btn btn-outline-secondary w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
-                <mat-icon class="fs-4 text-secondary">schedule</mat-icon>
-                <span class="fw-semibold text-dark small">Time & Clocking</span>
-                <small class="text-muted" style="font-size: 11px;">Clock in / clock out</small>
-              </a>
-            </div>
-            <div class="col-4">
-              <a routerLink="/dashboard/ai-copilot" class="btn btn-outline-purple w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none border-purple">
-                <mat-icon class="fs-4 text-purple">auto_awesome</mat-icon>
-                <span class="fw-semibold text-dark small">AI Copilot</span>
-                <small class="text-muted" style="font-size: 11px;">GenAI Assistant</small>
-              </a>
-            </div>
-            <div class="col-4">
-              <a routerLink="/dashboard/people" class="btn btn-outline-primary w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
-                <mat-icon class="fs-4 text-primary">person_add</mat-icon>
-                <span class="fw-semibold text-dark small">Add Employee</span>
-                <small class="text-muted" style="font-size: 11px;">Create new record</small>
-              </a>
-            </div>
-            <div class="col-4">
-              <a routerLink="/dashboard/payroll" class="btn btn-outline-success w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
-                <mat-icon class="fs-4 text-success">payments</mat-icon>
-                <span class="fw-semibold text-dark small">Process Payroll</span>
-                <small class="text-muted" style="font-size: 11px;">Salary distribution</small>
-              </a>
-            </div>
-            <div class="col-4">
-              <a routerLink="/dashboard/document" class="btn btn-outline-info w-100 p-3 rounded-3 text-start d-flex flex-column gap-1 hover-card text-decoration-none">
-                <mat-icon class="fs-4 text-info">description</mat-icon>
-                <span class="fw-semibold text-dark small">HR Documents</span>
-                <small class="text-muted" style="font-size: 11px;">Policies & letters</small>
-              </a>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Recent Activity Feed -->
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 flex-grow-1">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <h5 class="fw-bold mb-0 text-dark">Recent Activity</h5>
-            <small class="text-primary fw-semibold cursor-pointer">View All</small>
-          </div>
-
-          <!-- Activity List -->
-          <div class="d-flex flex-column gap-3">
-            <div *ngFor="let activity of recentActivities" class="d-flex align-items-start gap-3 p-2 rounded-3 hover-bg-light">
-              <div class="p-2 rounded-circle d-flex align-items-center justify-content-center" [class]="activity.badgeClass">
-                <mat-icon class="fs-6">{{ activity.icon }}</mat-icon>
-              </div>
-              <div class="flex-grow-1">
-                <div class="d-flex align-items-center justify-content-between">
-                  <h6 class="mb-0 fw-semibold text-dark style-13">{{ activity.title }}</h6>
-                  <small class="text-muted" style="font-size: 11px;">{{ activity.timestamp }}</small>
-                </div>
-                <small class="text-secondary" style="font-size: 12px;">{{ activity.description }}</small>
-              </div>
-            </div>
-          </div>
+      <div class="compact-card-content">
+        <span class="compact-label">Payroll Run-Rate</span>
+        <div class="compact-value-row">
+          <span class="compact-value">${{ totalMonthlyPayroll | number:'1.0-0' }}</span>
+          <span class="compact-pill pill-blue">Monthly Burn</span>
         </div>
       </div>
     </div>
+
+    <div class="compact-kpi-card" *ngIf="!isAdminOrManager">
+      <div class="compact-card-icon bg-emerald">
+        <mat-icon>task_alt</mat-icon>
+      </div>
+      <div class="compact-card-content">
+        <span class="compact-label">My Active Tasks</span>
+        <div class="compact-value-row">
+          <span class="compact-value">{{ myActiveTasksCount }}</span>
+          <span class="compact-pill pill-emerald">Done: {{ myCompletedTasksCount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI 3: SPRINT RESOLUTION -->
+    <div class="compact-kpi-card">
+      <div class="compact-card-icon bg-indigo">
+        <mat-icon>speed</mat-icon>
+      </div>
+      <div class="compact-card-content">
+        <span class="compact-label">Sprint Resolution</span>
+        <div class="compact-value-row">
+          <span class="compact-value">{{ completedTasksCount }} / {{ totalTasksCount }}</span>
+          <span class="compact-pill pill-indigo">{{ sprintVelocity }}% Velocity</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI 4: BUGS RESOLVED -->
+    <div class="compact-kpi-card">
+      <div class="compact-card-icon bg-purple">
+        <mat-icon>bug_report</mat-icon>
+      </div>
+      <div class="compact-card-content">
+        <span class="compact-label">Bugs Resolved</span>
+        <div class="compact-value-row">
+          <span class="compact-value">{{ bugsResolvedCount }}</span>
+          <span class="compact-pill pill-amber">In Progress: {{ inProgressTasksCount }}</span>
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- THREE-CARD TREND CHARTS ROW (MATCHING IMAGE_A1715B.PNG) -->
+  <div class="charts-three-col-row">
+
+    <!-- CHART CARD 1: SPRINT TASK VELOCITY (WEEKLY BAR CHART) -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <h3>Sprint Task Velocity</h3>
+        <p>Weekly Task Throughput</p>
+      </div>
+
+      <div class="chart-graphic-box">
+        <!-- SVG Green Bar Chart -->
+        <svg viewBox="0 0 280 120" width="100%" height="120" fill="none" class="chart-svg">
+          <!-- Background Grid Lines -->
+          <line x1="0" y1="30" x2="280" y2="30" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="60" x2="280" y2="60" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="90" x2="280" y2="90" stroke="#f1f5f9" stroke-width="1" />
+
+          <!-- Bars for M, T, W, T, F, S, S -->
+          <g *ngFor="let bar of weeklyBars; let i = index">
+            <rect [attr.x]="20 + (i * 38)" [attr.y]="100 - bar.heightPercent" width="22" [attr.height]="bar.heightPercent" rx="5" fill="#10b981" />
+            <text [attr.x]="31 + (i * 38)" y="115" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">{{ bar.dayLabel }}</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="chart-card-footer">
+        <mat-icon>schedule</mat-icon>
+        <span>updated live from task_db</span>
+      </div>
+    </div>
+
+    <!-- CHART CARD 2: TASK COMPLETION TREND (LINE GRAPH WITH DATA POINTS) -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <h3>Task Completion Trend</h3>
+        <p><strong class="text-emerald">(+15%)</strong> increase in sprint velocity.</p>
+      </div>
+
+      <div class="chart-graphic-box">
+        <!-- SVG Green Smooth Line Chart -->
+        <svg viewBox="0 0 280 120" width="100%" height="120" fill="none" class="chart-svg">
+          <line x1="0" y1="30" x2="280" y2="30" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="60" x2="280" y2="60" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="90" x2="280" y2="90" stroke="#f1f5f9" stroke-width="1" />
+
+          <!-- Green Line Path -->
+          <path d="M 20 85 L 55 60 L 90 80 L 125 35 L 160 55 L 195 40 L 230 75 L 265 50" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+          <!-- Data Points Circles -->
+          <circle cx="20" cy="85" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="55" cy="60" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="90" cy="80" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="125" cy="35" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="160" cy="55" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="195" cy="40" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="230" cy="75" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="265" cy="50" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+
+          <!-- Month Labels -->
+          <text x="20" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">J</text>
+          <text x="55" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">F</text>
+          <text x="90" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">M</text>
+          <text x="125" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">A</text>
+          <text x="160" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">M</text>
+          <text x="195" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">J</text>
+          <text x="230" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">J</text>
+          <text x="265" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">A</text>
+        </svg>
+      </div>
+
+      <div class="chart-card-footer">
+        <mat-icon>schedule</mat-icon>
+        <span>updated 4 min ago</span>
+      </div>
+    </div>
+
+    <!-- CHART CARD 3: COMPLETED TASKS & BUG FIXES (LINE GRAPH WITH RED INDICATOR) -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <h3>Completed Tasks & Bug Fixes</h3>
+        <p>Last 30-Day Resolution Performance</p>
+      </div>
+
+      <div class="chart-graphic-box">
+        <!-- SVG Green Line Chart -->
+        <svg viewBox="0 0 280 120" width="100%" height="120" fill="none" class="chart-svg">
+          <line x1="0" y1="30" x2="280" y2="30" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="60" x2="280" y2="60" stroke="#f1f5f9" stroke-width="1" />
+          <line x1="0" y1="90" x2="280" y2="90" stroke="#f1f5f9" stroke-width="1" />
+
+          <!-- Green Line Path -->
+          <path d="M 20 90 L 55 92 L 90 55 L 125 70 L 160 30 L 195 65 L 230 45 L 265 25" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+          <!-- Data Points -->
+          <circle cx="20" cy="90" r="4" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="55" cy="92" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="90" cy="55" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="125" cy="70" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="160" cy="30" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="195" cy="65" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="230" cy="45" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+          <circle cx="265" cy="25" r="4" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+
+          <!-- Month Labels -->
+          <text x="20" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Apr</text>
+          <text x="55" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">May</text>
+          <text x="90" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Jun</text>
+          <text x="125" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Jul</text>
+          <text x="160" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Aug</text>
+          <text x="195" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Sep</text>
+          <text x="230" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Oct</text>
+          <text x="265" y="115" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Nov</text>
+        </svg>
+      </div>
+
+      <div class="chart-card-footer">
+        <mat-icon>schedule</mat-icon>
+        <span>just updated</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM TWO-COLUMN COMMAND GRID -->
+  <div class="bottom-command-grid">
+
+    <!-- LEFT COLUMN: DEPARTMENT HEADCOUNT & RESOURCE DISTRIBUTION -->
+    <div class="command-card">
+      <div class="card-title-row">
+        <div class="title-with-icon">
+          <mat-icon class="title-icon text-blue">domain</mat-icon>
+          <div>
+            <h3>Department Headcount & Resource Distribution</h3>
+            <p>Live department breakdown derived from employee_db</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="department-list-grid">
+        <div *ngFor="let dept of departmentStats" class="dept-stat-item">
+          <div class="dept-info-head">
+            <span class="dept-name">{{ dept.name }}</span>
+            <span class="dept-meta">{{ dept.count }} Employees (${{ dept.totalSalary | number:'1.0-0' }}/mo)</span>
+          </div>
+          <div class="dept-progress-track">
+            <div class="dept-progress-fill" [class]="dept.colorClass" [style.width.%]="dept.percentage"></div>
+          </div>
+        </div>
+        <div *ngIf="departmentStats.length === 0" class="empty-state-text">
+          No department records found in database.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: REFINED COMPACT RECENT ACTIVITY AUDIT FEED (1-WEEK FILTERED) -->
+    <div class="command-card">
+      <div class="card-title-row">
+        <div class="title-with-icon">
+          <mat-icon class="title-icon text-amber">rss_feed</mat-icon>
+          <div>
+            <h3>Recent Activities (Last 7 Days)</h3>
+            <p>Compact live activity stream from notification_db</p>
+          </div>
+        </div>
+        <a [routerLink]="['/dashboard/notifications']" class="view-link">View Center →</a>
+      </div>
+
+      <div class="compact-activity-list">
+        <div *ngFor="let item of activityStream" class="compact-activity-item">
+          <div class="compact-act-icon" [ngClass]="getCategoryBadgeClass(item.category)">
+            <mat-icon>{{ getCategoryIcon(item.category) }}</mat-icon>
+          </div>
+          <div class="compact-act-body">
+            <div class="compact-act-header">
+              <span class="compact-act-title">{{ item.title }}</span>
+              <span class="compact-act-time">{{ item.createdAt | date:'shortTime' }}</span>
+            </div>
+            <p class="compact-act-msg">{{ item.message | slice:0:65 }}...</p>
+          </div>
+        </div>
+
+        <div *ngIf="activityStream.length === 0" class="empty-feed">
+          <mat-icon>notifications_off</mat-icon>
+          <p>No activity dispatches recorded in the last 7 days.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>

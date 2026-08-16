@@ -46,9 +46,28 @@ export class EmployeeListComponent implements OnInit {
     private aiService: AiService
   ) {}
 
+  setTab(tab: string) {
+    this.activeTab = tab;
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  get activeCount(): number {
+    return this.employees.filter(e => !e.status || 'ACTIVE'.equalsIgnoreCase(e.status)).length;
+  }
+
+  get onboardingCount(): number {
+    return this.employees.filter(e => 'ONBOARDING'.equalsIgnoreCase(e.status)).length;
+  }
+
+  get offboardingCount(): number {
+    return this.employees.filter(e => 'OFFBOARDING'.equalsIgnoreCase(e.status) || 'TERMINATED'.equalsIgnoreCase(e.status)).length;
+  }
+
   ngOnInit() {
     this.loadEmployees();
   }
+
 
   loadEmployees() {
     this.isLoading = true;
@@ -92,6 +111,15 @@ export class EmployeeListComponent implements OnInit {
     // Ensure employees is an array
     let result = Array.isArray(this.employees) ? [...this.employees] : [];
 
+    // 1. Apply Tab Filter (Active, Onboarding, Offboarding)
+    if (this.activeTab === 'active') {
+      result = result.filter(emp => !emp.status || 'ACTIVE'.equalsIgnoreCase(emp.status));
+    } else if (this.activeTab === 'onboarding') {
+      result = result.filter(emp => 'ONBOARDING'.equalsIgnoreCase(emp.status));
+    } else if (this.activeTab === 'offboarding') {
+      result = result.filter(emp => 'OFFBOARDING'.equalsIgnoreCase(emp.status) || 'TERMINATED'.equalsIgnoreCase(emp.status));
+    }
+
     // Apply search query
     if (this.searchQuery && result.length > 0) {
       const query = this.searchQuery.toLowerCase();
@@ -99,7 +127,8 @@ export class EmployeeListComponent implements OnInit {
         (emp) =>
           (emp.name && emp.name.toLowerCase().includes(query)) ||
           (emp.email && emp.email.toLowerCase().includes(query)) ||
-          (emp.department && emp.department.toLowerCase().includes(query)),
+          (emp.department && emp.department.toLowerCase().includes(query)) ||
+          (emp.techStackSummary && emp.techStackSummary.toLowerCase().includes(query)),
       );
     }
 
@@ -127,6 +156,7 @@ export class EmployeeListComponent implements OnInit {
         return 0;
       });
     }
+
 
     // Update pagination
     this.totalPages = Math.ceil(result.length / this.pageSize);

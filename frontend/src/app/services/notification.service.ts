@@ -104,4 +104,9 @@ export class NotificationService {
   getMetrics(): Observable<ApiResponse<NotificationMetrics>> {
     return this.http.get<ApiResponse<NotificationMetrics>>(`${this.baseUrl}/metrics`);
   }
+
+  getRecentActivityStream(): Observable<ApiResponse<NotificationItem[]>> {
+    return this.http.get<ApiResponse<NotificationItem[]>>(`${this.baseUrl}/recent`);
+  }
 }
+
