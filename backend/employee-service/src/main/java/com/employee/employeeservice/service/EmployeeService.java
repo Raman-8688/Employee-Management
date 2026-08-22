@@ -3,6 +3,7 @@ package com.employee.employeeservice.service;
 import com.employee.common.dto.EmployeeDto;
 import com.employee.employeeservice.entity.Employee;
 import com.employee.employeeservice.repository.EmployeeRepository;
+import com.employee.employeeservice.client.NotificationEventDispatcher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
-
-
-import com.employee.employeeservice.client.NotificationEventDispatcher;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,6 @@ public class EmployeeService {
     }
 
     public Employee findById(Long id) {
-
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
     }
@@ -78,11 +75,10 @@ public class EmployeeService {
         return saved;
     }
 
-
-
-
     public void deleteEmployee(Long id) {
+        Employee emp = findById(id);
         employeeRepository.deleteById(id);
+        notificationEventDispatcher.dispatchEmployeeDeletedNotification(emp.getName(), emp.getEmail());
     }
 
     public Map<String, Object> getEmployeeAnalytics() {
@@ -97,11 +93,11 @@ public class EmployeeService {
                 .mapToDouble(Employee::getSal)
                 .sum();
 
-        java.util.Map<String, Long> deptCounts = all.stream()
+        Map<String, Long> deptCounts = all.stream()
                 .filter(e -> e.getDepartment() != null && !e.getDepartment().trim().isEmpty())
                 .collect(Collectors.groupingBy(Employee::getDepartment, Collectors.counting()));
 
-        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("totalEmployees", total);
         response.put("activeEmployees", active);
         response.put("onboardingEmployees", onboarding);
@@ -126,5 +122,4 @@ public class EmployeeService {
                 .roles(emp.getRoles())
                 .build();
     }
-
 }

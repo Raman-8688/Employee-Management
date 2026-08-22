@@ -27,49 +27,35 @@ import java.util.UUID;
 @Slf4j
 public class EmployeeController {
 
-
     private final EmployeeService employeeService;
     private static final String UPLOAD_DIR = "uploads/profile-images/";
 
     @GetMapping("/findAll")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<List<Employee>> findAllEmployees() {
         return ResponseEntity.ok(employeeService.findAllEmployees());
     }
 
-    @GetMapping("/verify-email")
-    public ResponseEntity<ApiResponse<Boolean>> verifyEmailExists(@RequestParam("email") String email) {
-        boolean exists = employeeService.existsByEmail(email);
-        return ResponseEntity.ok(new ApiResponse<>("Email verification result", exists));
-    }
-
-    @GetMapping("/analytics")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getEmployeeAnalytics() {
-        return ResponseEntity.ok(new ApiResponse<>("Employee analytics fetched", employeeService.getEmployeeAnalytics()));
-    }
-
-
     @GetMapping("/{id}")
-
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(employeeService.findById(id));
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<EmployeeDto>> getEmployeeDetailsById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(new ApiResponse<>("Employee details fetched", employeeService.getEmployeeDtoById(id)));
     }
 
     @PostMapping("/save")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
         return ResponseEntity.ok(employeeService.saveEmployee(employee));
     }
 
-    @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/upload-image")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public ResponseEntity<ApiResponse<Map<String, String>>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
         try {
             File uploadFolder = new File(UPLOAD_DIR);
@@ -90,7 +76,6 @@ public class EmployeeController {
             String imageUrl = "http://localhost:8080/uploads/profile-images/" + newFilename;
             Map<String, String> response = new HashMap<>();
             response.put("imageUrl", imageUrl);
-            response.put("url", imageUrl);
 
             return ResponseEntity.ok(new ApiResponse<>("Image uploaded successfully", response));
         } catch (IOException e) {
@@ -99,25 +84,14 @@ public class EmployeeController {
         }
     }
 
-
-    @PatchMapping("/update")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
-    public ResponseEntity<Employee> updateEmployeePatch(@RequestBody Employee employee) {
-        if (employee.getId() == null) {
-            throw new IllegalArgumentException("Employee ID is required for update");
-        }
-        return ResponseEntity.ok(employeeService.updateEmployee(employee.getId(), employee));
-    }
-
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_HR', 'ROLE_EMPLOYEE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
         return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
     }
 
-
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok().build();
