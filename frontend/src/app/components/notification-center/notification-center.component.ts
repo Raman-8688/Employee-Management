@@ -70,6 +70,10 @@ export class NotificationCenterComponent implements OnInit {
     });
   }
 
+  setCategoryFilter(category: string): void {
+    this.filterCategory = category;
+  }
+
   loadMetrics(): void {
     this.notificationService.getMetrics().subscribe({
       next: (res) => {
@@ -86,12 +90,24 @@ export class NotificationCenterComponent implements OnInit {
   }
 
   get filteredNotificationsList(): NotificationItem[] {
-
     return this.notifications.filter(n => {
+      // 1. Category Matching
+      let matchesCategory = true;
+      if (this.filterCategory === 'UNREAD') {
+        matchesCategory = !n.readStatus;
+      } else if (this.filterCategory && this.filterCategory !== 'ALL') {
+        matchesCategory = n.category === this.filterCategory;
+      }
+
+      // 2. Unread Only Checkbox
+      const matchesUnread = !this.unreadOnly || !n.readStatus;
+
+      // 3. Search Query
       const matchesSearch = !this.searchQuery ||
         n.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         n.message.toLowerCase().includes(this.searchQuery.toLowerCase());
-      return matchesSearch;
+
+      return matchesCategory && matchesUnread && matchesSearch;
     });
   }
 
